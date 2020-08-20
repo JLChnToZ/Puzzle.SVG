@@ -215,7 +215,7 @@ export class MainHandler {
     const otherIsGroup = other.classList.contains('group');
     if(currentIsGroup) {
       if(otherIsGroup) {
-        for(const child of other.childNodes)
+        for(const child of Array.from(other.childNodes))
           current.appendChild(child);
         other.remove();
       } else {
