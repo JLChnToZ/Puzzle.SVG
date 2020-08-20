@@ -5,7 +5,7 @@ export async function downloadDocument(src: Element, name: string) {
   const root = document.implementation.createDocument(NS_SVG, 'svg', null);
   const clone = root.importNode(src, true);
   root.replaceChild(clone, root.firstChild!);
-  await Promise.all(Array.from(clone.querySelectorAll('script')).map(resolveScript));
+  await Promise.all(Array.prototype.map.call(clone.querySelectorAll('script'), resolveScript));
   const blob = new Blob([new XMLSerializer().serializeToString(root)], { type: 'image/svg+xml' });
   const element = document.createElementNS(NS_XHTML, 'a') as HTMLAnchorElement;
   element.href = URL.createObjectURL(blob);
