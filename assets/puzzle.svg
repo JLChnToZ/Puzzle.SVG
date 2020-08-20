@@ -2,15 +2,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewbox="0 0 640 480" width="640" height="480" class="noscript">
   <defs>
     <g id="ps"></g>
-    <filter id="imgsrcfilter">
-      <feGaussianBlur stdDeviation="5" />
-      <feColorMatrix type="matrix"
-        values="0.5 0.1 0.1 0 0
-          0.1 0.5 0.1 0 0
-          0.1 0.1 0.5 0 0
-          0 0 0 1 0"
-      />
-    </filter>
+    <image id="img" width="1" height="1" pointer-events="none"
+      href="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+    />
     <filter id="shadow" x="0" y="0" width="200%" height="200%">
       <feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="5" />
@@ -18,11 +12,6 @@
     </filter>
   </defs>
   <g transform="translate(0, 20)">
-    <g filter="url(#imgsrcfilter)">
-      <image id="img" width="1" height="1" pointer-events="none"
-        href="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
-      />
-    </g>
     <g id="ins"></g>
   </g>
   <g>

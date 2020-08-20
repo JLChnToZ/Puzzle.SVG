@@ -19,6 +19,7 @@ interface StoredData {
 export class MainHandler {
   document: Document;
   root: SVGSVGElement;
+  defsElement: SVGDefsElement;
   imageElement: SVGImageElement;
   pathGroup: SVGGElement;
   instanceGroup: SVGGElement;
@@ -62,6 +63,7 @@ export class MainHandler {
     root.querySelector('.noscript')?.classList.remove('noscript');
     this.root = root.querySelector('svg')!;
     this.document = root instanceof Document ? root : this.root.ownerDocument;
+    this.defsElement = root.querySelector('defs')!;
     this.pathGroup = root.querySelector<SVGGElement>('g#ps')!;
     this.instanceGroup = root.querySelector<SVGGElement>('g#ins')!;
     this.timeDisp = root.querySelector<SVGTextElement>('text#time')!;
@@ -104,7 +106,7 @@ export class MainHandler {
   init() {
     clearChildren(this.pathGroup);
     clearChildren(this.instanceGroup);
-    for(const oldMask of this.document.querySelectorAll('mask.puzzle-mask'))
+    for(const oldMask of this.defsElement.querySelectorAll('mask.puzzle-mask'))
       oldMask.remove();
     this.time = 0;
     this.baseTime = 0;
@@ -112,21 +114,26 @@ export class MainHandler {
     delete this.endTime;
     delete this.resumeTime;
     this.timeDisp.textContent = '--:--';
+    if(this.timer != null) {
+      clearInterval(this.timer);
+      delete this.timer;
+    }
     const paths = new JigsawGenerator(
       this.width, this.height,
       this._xc, this._yc,
       undefined, undefined, undefined,
       10,
     ).toSvgElements(this.document, this.pathGroup);
-    this.root.setAttribute('viewbox', `0 0 ${Math.max(640, this.width * 1.5)} ${Math.max(480, this.height * 1.5)}`);
-    this.root.setAttribute('width', Math.max(640, this.width * 1.5).toString(10));
-    this.root.setAttribute('height', Math.max(480, this.height * 1.5).toString(10));
+    const viewWidth = Math.max(640, this.width * 1.5);
+    const viewHeight = Math.max(480, this.height * 1.5);
+    this.root.setAttribute('viewbox', `0 0 ${viewWidth} ${viewHeight}`);
+    this.root.setAttribute('width', viewWidth.toString(10));
+    this.root.setAttribute('height', viewHeight.toString(10));
     this.imageElement.href.baseVal = this.imageUrl;
     this.imageElement.setAttribute('width', this.width.toString());
     this.imageElement.setAttribute('height', this.height.toString());
-    const { firstChild } = this.root;
     for(const path of paths) {
-      const mask = this.root.insertBefore(this.document.createElementNS(NS_SVG, 'mask'), firstChild);
+      const mask = this.defsElement.appendChild(this.document.createElementNS(NS_SVG, 'mask'));
       mask.id = `${path.id}-m`;
       mask.classList.add('puzzle-mask');
 
@@ -147,6 +154,16 @@ export class MainHandler {
       decoPath.href.baseVal = `#${path.id}`;
       decoPath.setAttribute('stroke', 'black');
       decoPath.setAttribute('fill', 'transparent');
+
+      const m = pathIdMatcher.exec(path.id);
+      if(m) {
+        const w = this.width / this._xc;
+        const h = this.height / this._yc;
+        instance.transform.baseVal.appendItem(this.root.createSVGTransform()).setTranslate(
+          Math.round(Math.random() * (viewWidth - w) - parseInt(m[1], 10) * w),
+          Math.round(Math.random() * (viewHeight - h) - parseInt(m[2], 10) * h),
+        );
+      }
     }
   }
 
@@ -170,7 +187,10 @@ export class MainHandler {
     if(this.instanceGroup.childElementCount > 1)
       return;
     this.endTime = new Date();
-    clearInterval(this.timer);
+    if(this.timer != null) {
+      clearInterval(this.timer);
+      delete this.timer;
+    }
     const lastElement = this.instanceGroup.querySelector<SVGGraphicsElement>('.draggable.group');
     if(lastElement) {
       lastElement.classList.remove('draggable');
