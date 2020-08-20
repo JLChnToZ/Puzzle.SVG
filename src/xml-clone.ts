@@ -1,11 +1,14 @@
+import { NS_SVG, NS_XHTML } from './utils';
 
-export async function downloadDocument(src: Element, name: string, type?: string) {
-  const root = new XMLDocument();
+export async function downloadDocument(src: Element, name: string) {
+  const document = src.ownerDocument;
+  const root = document.implementation.createDocument(NS_SVG, 'svg', null);
   const clone = root.importNode(src, true);
+  root.replaceChild(clone, root.firstChild!);
   await Promise.all(Array.from(clone.querySelectorAll('script')).map(resolveScript));
-  const str = new Blob([new XMLSerializer().serializeToString(root)], { type });
-  const element = src.ownerDocument.createElement('a');
-  element.href = URL.createObjectURL(new Blob([str]));
+  const blob = new Blob([new XMLSerializer().serializeToString(root)], { type: 'image/svg+xml' });
+  const element = document.createElementNS(NS_XHTML, 'a') as HTMLAnchorElement;
+  element.href = URL.createObjectURL(blob);
   element.download = name;
   element.click();
   URL.revokeObjectURL(element.href);

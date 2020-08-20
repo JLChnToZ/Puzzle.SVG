@@ -1,4 +1,5 @@
 export const NS_SVG = 'http://www.w3.org/2000/svg';
+export const NS_XHTML = 'http://www.w3.org/1999/xhtml';
 
 export function getUrl(blob: Blob) {
   return new Promise<string>((resolve, reject) => {

@@ -17,7 +17,7 @@
   <g>
     <text id="time" x="10" y="20">--:--</text>
     <text id="new-game" class="button" x="70" y="20">New Game</text>
-    <text id="save-save" class="button" x="150" y="20">Save Progress</text>
+    <text id="save-game" class="button" x="150" y="20">Save Progress</text>
     <text class="noscript-warn" x="70" y="20">Please open in browser to play!</text>
   </g>
   <g id="certificate">

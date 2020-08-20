@@ -283,7 +283,7 @@ export class MainHandler {
       endTime: this.endTime?.getTime(),
       time: this.time,
     } as StoredData);
-    return downloadDocument(this.root, `puzzle-${Date.now()}.svg`, 'image/svg+xml');
+    return downloadDocument(this.root, `puzzle-${Date.now()}.svg`);
   }
 
   private async onImageSelected() {
