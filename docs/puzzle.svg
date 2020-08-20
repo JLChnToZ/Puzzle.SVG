@@ -26,7 +26,9 @@
     <rect x="43" y="43" width="274" height="194" stroke="#060" fill="transparent" stroke-width="0.5" />
     <text x="180" y="80" text-anchor="middle" class="h1">Congratulations!</text>
     <text x="180" y="100" text-anchor="middle">You have beat the puzzle in</text>
-    <text x="180" y="120" text-anchor="middle" id="time-used">--:--</text>
+    <text x="180" y="120" text-anchor="middle" id="time-used"></text>
+    <text x="180" y="150" text-anchor="middle">Puzzle Size</text>
+    <text x="180" y="170" text-anchor="middle" id="puzzle-size"></text>
     <text x="50" y="210">Since</text>
     <text x="100" y="210" id="time-start">&lt;date&gt;</text>
     <text x="50" y="230">Until</text>
