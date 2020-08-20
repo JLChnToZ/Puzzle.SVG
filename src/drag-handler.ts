@@ -31,7 +31,7 @@ export function registerDraggable(
   }
 
   function onStartDrag(e: MouseEvent | TouchEvent) {
-    let target = (e.target as Element)?.closest?.(`${draggableClass}>${handlerClass}, ${draggableClass}${handlerClass}`);
+    let target = (e.target as Element)?.closest?.(`${draggableClass} ${handlerClass}, ${draggableClass}${handlerClass}`);
     if(!(target instanceof SVGGraphicsElement)) return;
     const root = target.ownerSVGElement!;
     let pointer: Touch | MouseEvent | undefined;
@@ -68,7 +68,7 @@ export function registerDraggable(
       pointer = e as MouseEvent;
     }
     if(!pointer) return;
-    const element = target.matches('.draggable') ? target : target.parentNode! as SVGGraphicsElement;
+    const element = target.matches(draggableClass) ? target : target?.closest<SVGGraphicsElement>(draggableClass) as SVGGraphicsElement;
     if(draggingElements.has(element)) return;
     const transforms = element.transform.baseVal;
     if(!transforms.numberOfItems || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {

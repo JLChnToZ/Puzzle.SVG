@@ -92,8 +92,8 @@
       font-size: x-large;
       font-weight: bold;
     }
-    .draggable>.handler, .draggable.handler {
-      cursor: drag;
+    .draggable .handler, .draggable.handler {
+      cursor: move;
     }
   ]]>
   </style>

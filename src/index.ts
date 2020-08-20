@@ -4,7 +4,7 @@ import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG } from '.
 import { downloadDocument } from './xml-clone';
 import { showCertificate } from './certificate';
 
-const pathIdMatcher = /^p-(\d+)-(\d+)$/;
+const pathIdMatcher = /^p-(\d+)-(\d+)/;
 
 interface StoredData {
   width: number;
@@ -112,8 +112,12 @@ export class MainHandler {
     delete this.endTime;
     delete this.resumeTime;
     this.timeDisp.textContent = '--:--';
-    const paths = new JigsawGenerator(this.width, this.height, this._xc, this._yc)
-      .toSvgElements(this.document, this.pathGroup);
+    const paths = new JigsawGenerator(
+      this.width, this.height,
+      this._xc, this._yc,
+      undefined, undefined, undefined,
+      10,
+    ).toSvgElements(this.document, this.pathGroup);
     this.root.setAttribute('viewbox', `0 0 ${Math.max(640, this.width * 1.5)} ${Math.max(480, this.height * 1.5)}`);
     this.root.setAttribute('width', Math.max(640, this.width * 1.5).toString(10));
     this.root.setAttribute('height', Math.max(480, this.height * 1.5).toString(10));
@@ -154,7 +158,7 @@ export class MainHandler {
   }
 
   private onDrop(state: DraggingState) {
-    const { id } = state.target;
+    const { id } = state.target.parentNode as Element;
     const m = pathIdMatcher.exec(id);
     if(!m) return;
     const x = parseInt(m[1], 10);
@@ -185,7 +189,7 @@ export class MainHandler {
     if(!t2.numberOfItems) return current;
     const m1 = t1.getItem(0).matrix;
     const m2 = t2.getItem(0).matrix;
-    if(Math.abs(m1.e - m2.e) > 1 || Math.abs(m1.f - m2.f) > 1)
+    if(Math.sqrt((m1.e - m2.e) ** 2 + (m1.f - m2.f) ** 2) > 3)
       return current;
     const currentIsGroup = current.classList.contains('group');
     const otherIsGroup = other.classList.contains('group');
@@ -210,7 +214,9 @@ export class MainHandler {
     const newGroup = current.parentNode!.appendChild(this.document.createElementNS(NS_SVG, 'g'));
     newGroup.classList.add('draggable', 'group');
     newGroup.appendChild(current);
+    current.classList.remove('draggable');
     newGroup.appendChild(other);
+    other.classList.remove('draggable');
     const t = t2.getItem(0);
     t1.removeItem(0);
     t2.removeItem(0);

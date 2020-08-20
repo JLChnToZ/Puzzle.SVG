@@ -117,8 +117,8 @@ export class JigsawGenerator {
 
     this.cells = [];
     for(const [i, stroke] of this.strokes) {
-      const y = Math.trunc(i / this.yCount);
-      (this.cells[y] ?? (this.cells[y] = []))[i % this.yCount] = this.getNormalizedStroke(stroke);
+      const y = Math.trunc(i / this.xCount);
+      (this.cells[y] ?? (this.cells[y] = []))[i % this.xCount] = this.getNormalizedStroke(stroke);
     }
 
     this.strokes.clear();
