@@ -135,9 +135,7 @@ export class MainHandler {
     ).toSvgElements(this.document, this.pathGroup);
     const viewWidth = Math.max(640, this.width * 1.5);
     const viewHeight = Math.max(480, this.height * 1.5);
-    this.root.setAttribute('viewbox', `0 0 ${viewWidth} ${viewHeight}`);
-    this.root.setAttribute('width', viewWidth.toString(10));
-    this.root.setAttribute('height', viewHeight.toString(10));
+    this.root.setAttribute('viewBox', `0 0 ${viewWidth} ${viewHeight}`);
     this.imageElement.href.baseVal = this.imageUrl;
     this.imageElement.setAttribute('width', this.width.toString());
     this.imageElement.setAttribute('height', this.height.toString());
@@ -209,9 +207,7 @@ export class MainHandler {
     }
     const viewWidth = Math.max(640, this.width);
     const viewHeight = Math.max(480, this.height);
-    this.root.setAttribute('viewbox', `0 0 ${viewWidth} ${viewHeight}`);
-    this.root.setAttribute('width', viewWidth.toString(10));
-    this.root.setAttribute('height', viewHeight.toString(10));
+    this.root.setAttribute('viewBox', `0 0 ${viewWidth} ${viewHeight}`);
     showCertificate(this);
   }
 
