@@ -35,21 +35,47 @@ export function clearChildren(node: Node) {
     node.removeChild(node.firstChild!);
 }
 
+export function formatNumber(n: number, digits: number) {
+  return n.toString(10).padStart(digits, '0');
+}
+
 export function formatTime(time: number) {
   const absTime = Math.abs(time);
   let result = `${
-    Math.floor(absTime / 6e4 % 60).toString(10).padStart(2, '0')
+    formatNumber(Math.floor(absTime / 6e4 % 60), 2)
   }:${
-    Math.floor(absTime / 1e3 % 60).toString(10).padStart(2, '0')
+    formatNumber(Math.floor(absTime / 1e3 % 60), 2)
   }`;
   if(time < 36e5) return (time < 0 ? '-' : '') + result;
   result = `${
-    Math.floor(absTime / 36e5 % 24).toString(10).padStart(2, '0')
+    formatNumber(Math.floor(absTime / 36e5 % 24), 2)
   }:${result}`;
   if(time < 864e5) return (time < 0 ? '-' : '') + result;
   return `${
-    Math.floor(time / 864e5).toString(10).padStart(2, '0')
+    formatNumber(Math.floor(time / 864e5), 2)
   }d ${result}`;
+}
+
+export function formatDateTime(date: Date = new Date()) {
+  const yr = date.getFullYear();
+  const mo = date.getMonth();
+  const dy = date.getDate();
+  const hr = date.getHours();
+  const mi = date.getMinutes();
+  const se = date.getSeconds();
+  return `${
+    formatNumber(dy, 2)
+  }/${
+    formatNumber(mo + 1, 2)
+  }/${
+    formatNumber(yr, 4)
+  } ${
+    formatNumber(hr % 12 || 12, 2)
+  }:${
+    formatNumber(mi, 2)
+  }:${
+    formatNumber(se, 2)
+  } ${hr >= 12 ? 'PM' : 'AM'}`;
 }
 
 export function getSeed(seed: any): number {

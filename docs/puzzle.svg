@@ -14,14 +14,14 @@
   <g transform="translate(0, 20)">
     <g id="ins"></g>
   </g>
-  <g>
+  <g id="hud">
     <text id="time" x="10" y="20">--:--</text>
     <text id="new-game" class="button" x="70" y="20">New Game</text>
     <text id="save-game" class="button" x="150" y="20">Save Progress</text>
     <text class="noscript-warn" x="70" y="20">Please open in browser to play!</text>
   </g>
   <g id="certificate">
-    <rect x="20" y="20" width="320" height="240" stroke="#0008" stroke-width="0.1" fill="#FFF" />
+    <rect x="20" y="20" width="320" height="240" stroke="#0008" stroke-width="0.1" fill="#FFF" filter="url(#shadow)" />
     <rect x="40" y="40" width="280" height="200" stroke="#060" fill="transparent" stroke-width="0.5" />
     <rect x="43" y="43" width="274" height="194" stroke="#060" fill="transparent" stroke-width="0.5" />
     <text x="180" y="80" text-anchor="middle" class="h1">Congratulations!</text>
@@ -39,18 +39,43 @@
     <foreignObject x="10" y="10" width="320" height="240">
       <body xmlns="http://www.w3.org/1999/xhtml">
         <form id="menuform">
-          <label>Image: <input id="image-input" type="file" accept="image/*" /></label><br />
-          <label>Puzzle Size: </label>
-          <input type="number" class="size-input" id="col-input" size="3" min="1" value="1" />
-          <label>x</label>
-          <input type="number" class="size-input" id="row-input" size="3" min="1" value="1" /><br />
-          <button type="submit">Start Game</button>
-          <button type="reset">Cancel</button>
+          <div>
+            <label>Image: <input id="image-input" type="file" accept="image/*" /></label>
+          </div>
+          <div>
+            <label>Puzzle Size: </label>
+            <input type="number" class="size-input" id="col-input" size="3" min="1" value="1" />
+            <label>×</label>
+            <input type="number" class="size-input" id="row-input" size="3" min="1" value="1" />
+          </div>
+          <div class="align-center">
+            <button type="submit">Start Game</button>
+            <button type="reset">Cancel</button>
+          </div>
+          <div class="align-center">
+            <img id="preview" src="" />
+          </div>
         </form>
       </body>
     </foreignObject>
   </g>
   <style type="text/css"><![CDATA[
+    text, body {
+      user-select: none;
+    }
+    img[src=""] {
+      display: none;
+    }
+    #preview {
+      max-height: 110px;
+      max-width: 300px;
+    }
+    #menuform div {
+      margin: 0.5em;
+    }
+    .align-center {
+      text-align: center;
+    }
     .button {
       cursor: pointer;
       fill: #04F;
@@ -72,15 +97,16 @@
       touch-action: none;
     }
     #certificate {
-      filter: url(#shadow);
       pointer-events: none;
+    }
+    #certificate, #hud, #menu {
+      font-family: Georgia, 'Times New Roman', serif;
     }
     #certificate:not(.show), #menu:not(.show) {
       display: none;
     }
     #certificate text {
       fill: #060;
-      font-family: Georgia, 'Times New Roman', serif;
     }
     #certificate .h1 {
       font-size: x-large;

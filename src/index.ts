@@ -28,6 +28,7 @@ export class MainHandler {
   menuGroup: SVGGElement;
   menuForm: HTMLFormElement;
   imageSelector: HTMLInputElement;
+  imagePreview: HTMLImageElement;
   colSelector: HTMLInputElement;
   rowSelector: HTMLInputElement;
 
@@ -82,6 +83,7 @@ export class MainHandler {
     const onRowChange = this.onRowChange.bind(this);
     this.rowSelector.addEventListener('change', onRowChange);
     this.rowSelector.addEventListener('blur', onRowChange);
+    this.imagePreview = this.menuForm.querySelector<HTMLImageElement>('img#preview')!;
     this.root.querySelector('#new-game')?.addEventListener('click', this.menu.bind(this));
     this.root.querySelector('#save-game')?.addEventListener('click', this.save.bind(this));
     this.imageElement = root.querySelector<SVGImageElement>('image#img')!;
@@ -289,9 +291,13 @@ export class MainHandler {
   private async onImageSelected() {
     const { files } = this.imageSelector;
     if(!files || !files.length) return;
-    await this.updateImage(files.item(0)!);
+    const file = files.item(0)!;
+    await this.updateImage(file);
     this.colSelector.valueAsNumber = this.xCount = Math.round(this.width / 100);
     this.rowSelector.valueAsNumber = this.yCount;
+    if(this.imagePreview.src.startsWith('blob:'))
+      URL.revokeObjectURL(this.imagePreview.src);
+    this.imagePreview.src = URL.createObjectURL(file);
   }
 
   private onColChange() {
@@ -312,6 +318,9 @@ export class MainHandler {
   }
 
   private onMenuReset() {
+    if(this.imagePreview.src.startsWith('blob:'))
+      URL.revokeObjectURL(this.imagePreview.src);
+    this.imagePreview.src = '';
     this.menuGroup.classList.remove('show');
   }
 }
