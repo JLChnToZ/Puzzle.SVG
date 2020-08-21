@@ -68,6 +68,9 @@
     .noscript .noscript-warn {
       display: block;
     }
+    #ins {
+      touch-action: none;
+    }
     #certificate {
       filter: url(#shadow);
       pointer-events: none;

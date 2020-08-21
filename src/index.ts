@@ -87,7 +87,7 @@ export class MainHandler {
     this.imageElement = root.querySelector<SVGImageElement>('image#img')!;
     this.imageUrl = this.imageElement.href.baseVal;
     Object.assign(this, registerDraggable(
-      this.instanceGroup, this.onDrag.bind(this), this.onDrop.bind(this),
+      root, this.onDrag.bind(this), this.onDrop.bind(this),
     ));
     this.load();
   }
@@ -316,4 +316,4 @@ export class MainHandler {
   }
 }
 
-Object.assign(window, { main: new MainHandler() });
+new MainHandler();

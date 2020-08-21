@@ -20,10 +20,10 @@ export function registerDraggable(
   root.addEventListener('mousemove', onDragging);
   root.addEventListener('mouseup', onEndDrag);
   root.addEventListener('mouseleave', onEndDrag);
-  root.addEventListener('touchstart', onStartDrag, true);
-  root.addEventListener('touchmove', onDragging);
-  root.addEventListener('touchend', onEndDrag);
-  root.addEventListener('touchcancel', onEndDrag);
+  root.addEventListener('touchstart', onStartDrag, { capture: true, passive: false });
+  root.addEventListener('touchmove', onDragging, { passive: false });
+  root.addEventListener('touchend', onEndDrag, { passive: false });
+  root.addEventListener('touchcancel', onEndDrag, { passive: false });
 
   function getState(e: MouseEvent | Touch) {
     const state = states.get((e as Touch).identifier);
@@ -38,29 +38,37 @@ export function registerDraggable(
     let identifier: number | undefined;
     const { targetTouches } = e as TouchEvent;
     if(targetTouches) {
-      const ctm = target.getScreenCTM()!.inverse();
-      if(target instanceof SVGGeometryElement)
-        for(let i = 0; i < targetTouches.length; i++) {
-          const touch = targetTouches[i];
-          const lp = getLocalPoint(root, touch, ctm);
-          if(target.isPointInFill(lp) || target.isPointInStroke(lp)) {
-            identifier = touch.identifier;
-            pointer = touch;
-            break;
+      let srcElement: Element | null | undefined = target;
+      const ctm = (target.parentNode as SVGGraphicsElement)?.getScreenCTM?.()?.inverse();
+      while(srcElement) {
+        if(srcElement instanceof SVGUseElement) {
+          srcElement = root.querySelector(srcElement.href.baseVal);
+          continue;
+        }
+        if(srcElement instanceof SVGGeometryElement) {
+          for(let i = 0; i < targetTouches.length; i++) {
+            const touch = targetTouches[i];
+            const lp = getLocalPoint(root, touch, ctm);
+            if(srcElement.isPointInFill(lp) || srcElement.isPointInStroke(lp)) {
+              identifier = touch.identifier;
+              pointer = touch;
+              break;
+            }
+          }
+        } else if(srcElement instanceof SVGGraphicsElement) {
+          const bbox = target.getBBox();
+          for(let i = 0; i < targetTouches.length; i++) {
+            const touch = targetTouches[i];
+            const lp = getLocalPoint(root, touch, ctm);
+            if(bbox.left <= lp.x && bbox.right > lp.x &&
+              bbox.top <= lp.y && bbox.bottom > lp.y) {
+              identifier = touch.identifier;
+              pointer = touch;
+              break;
+            }
           }
         }
-      else {
-        const bbox = target.getBBox();
-        for(let i = 0; i < targetTouches.length; i++) {
-          const touch = targetTouches[i];
-          const lp = getLocalPoint(root, touch, ctm);
-          if(bbox.left <= lp.x && bbox.right > lp.x &&
-            bbox.top <= lp.y && bbox.bottom > lp.y) {
-            identifier = touch.identifier;
-            pointer = touch;
-            break;
-          }
-        }
+        break;
       }
     } else {
       if((e as MouseEvent).button !== 0)
@@ -85,7 +93,7 @@ export function registerDraggable(
       offsetX: offset.x,
       offsetY: offset.y,
     };
-    draggingElements.set(target, state);
+    draggingElements.set(element, state);
     states.set(identifier, state);
     element.parentNode?.appendChild(element);
     interceptEvent(e);
@@ -93,10 +101,11 @@ export function registerDraggable(
   }
   
   function onDragging(e: MouseEvent | TouchEvent) {
+    if(!states.size) return;
     const { changedTouches } = e as TouchEvent;
     if(changedTouches ?
       Array.prototype.map.call(changedTouches, handleDrag).includes(true) :
-      handleDrag(e as MouseEvent))
+      ((e as MouseEvent).button === 0 && handleDrag(e as MouseEvent)))
       interceptEvent(e);
   }
   
@@ -116,6 +125,7 @@ export function registerDraggable(
   }
   
   function onEndDrag(e: MouseEvent | TouchEvent) {
+    if(!states.size) return;
     const { changedTouches } = e as TouchEvent;
     if(changedTouches ?
       Array.prototype.map.call(changedTouches, handleEndDrag).includes(true) :
@@ -127,7 +137,7 @@ export function registerDraggable(
     const state = getState(e);
     if(!state) return false;
     draggingElements.delete(state.element);
-    states.delete((e as Touch).identifier);
+    states.delete(state.identifier);
     onDrop?.(state);
     return true;
   }
@@ -142,16 +152,16 @@ export function registerDraggable(
 function getLocalPoint(
   root: SVGSVGElement,
   pointer: MouseEvent | Touch,
-  base: DOMMatrix | SVGGraphicsElement,
+  base?: DOMMatrix | SVGGraphicsElement | null,
 ) {
   const p = root.createSVGPoint();
   p.x = pointer.clientX;
   p.y = pointer.clientY;
-  return p.matrixTransform(
+  return base != null ? p.matrixTransform(
     base instanceof SVGGraphicsElement ?
     base.getScreenCTM()!.inverse() :
     base,
-  );
+  ) : p;
 }
 
 function interceptEvent(e: Event) {
