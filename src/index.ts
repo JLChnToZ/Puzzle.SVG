@@ -2,7 +2,7 @@ import { JigsawGenerator } from './puzzle-generator';
 import { registerDraggable, DraggingState } from './drag-handler';
 import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG } from './utils';
 import { downloadDocument } from './xml-clone';
-import { showCertificate } from './certificate';
+import { showCertificate, hideCetificate } from './certificate';
 
 const pathIdMatcher = /^p-(\d+)-(\d+)/;
 
@@ -115,6 +115,7 @@ export class MainHandler {
     clearChildren(this.instanceGroup);
     for(const oldMask of this.defsElement.querySelectorAll('mask.puzzle-mask'))
       oldMask.remove();
+    hideCetificate();
     this.time = 0;
     this.baseTime = 0;
     this.startTime = new Date();
