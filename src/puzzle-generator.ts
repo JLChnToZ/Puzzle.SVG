@@ -1,4 +1,4 @@
-import { NS_SVG, getSeed } from './utils';
+import { NS_SVG, getSeed, round } from './utils';
 // Modified from https://gist.github.com/Draradech/35d36347312ca6d0887aa7d55f366e30
 // Changes: Outputs per-puzzle path instead of one for all.
 
@@ -74,7 +74,7 @@ export class JigsawGenerator {
     this.vertical = false;
     this.pushStroke(0, {
       points: [
-        0, this.sw,
+        0, round(this.sw, 3),
         0, this.radius,
         this.radius, this.radius, 0, 0, 1,
         this.radius, 0,
@@ -85,7 +85,7 @@ export class JigsawGenerator {
     this.vertical = true;
     this.pushStroke(this.xCount - 1, {
       points: [
-        this.width - this.sw, 0,
+        round(this.width - this.sw), 0,
         this.width - this.radius, 0,
         this.radius, this.radius, 0, 0, 1,
         this.width, this.radius,
@@ -96,7 +96,7 @@ export class JigsawGenerator {
     this.vertical = false;
     this.pushStroke(this.xCount * this.yCount - 1, {
       points: [
-        this.width, this.height - this.sw,
+        this.width, round(this.height - this.sw, 3),
         this.width, this.height - this.radius,
         this.radius, this.radius, 0, 0, 1,
         this.width - this.radius, this.height,
@@ -107,7 +107,7 @@ export class JigsawGenerator {
     this.vertical = true;
     this.pushStroke(this.xCount * (this.yCount - 1), {
       points: [
-        this.sw, this.height,
+        round(this.sw, 3), this.height,
         this.radius, this.height,
         this.radius, this.radius, 0, 0, 1, 0,
         this.height - this.radius,
@@ -207,11 +207,11 @@ export class JigsawGenerator {
   }
 
   private l(v: number) {
-    return Math.round((this.ol + this.sl * v + Number.EPSILON) * 1000) / 1000;
+    return round(this.ol + this.sl * v, 3);
   }
 
   private w(v: number) {
-    return Math.round((this.ow + this.sw * v * (this.flip ? -1 : 1) + Number.EPSILON) * 1000) / 1000;
+    return round(this.ow + this.sw * v * (this.flip ? -1 : 1), 3);
   }
 
   private pushStroke(i: number, stroke: Stroke) {
@@ -238,8 +238,8 @@ export class JigsawGenerator {
             strokeSet.delete(other);
             break;
           } else if(
-            result.points[0] === other.points[other.points.length - 2] &&
-            result.points[1] === other.points[other.points.length - 1]
+            Math.abs(result.points[0] - other.points[other.points.length - 2]) < 1 &&
+            Math.abs(result.points[1] - other.points[other.points.length - 1]) < 1
           ) {
             result.points.splice(0, 2, ...other.points);
             result.inst.splice(0, 1, ...other.inst);
@@ -247,8 +247,8 @@ export class JigsawGenerator {
             strokeSet.delete(other);
             break;
           } else if(
-            other.points[0] === result.points[result.points.length - 2] &&
-            other.points[1] === result.points[result.points.length - 1]
+            Math.abs(other.points[0] - result.points[result.points.length - 2]) < 1 &&
+            Math.abs(other.points[1] - result.points[result.points.length - 1]) < 1
           ) {
             other.points.splice(0, 2, ...result.points);
             other.inst.splice(0, 1, ...result.inst);
