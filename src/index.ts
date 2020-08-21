@@ -36,6 +36,7 @@ export class MainHandler {
   width: number = 1;
   height: number = 1;
   baseTime: number = 0;
+  theshold: number = 3;
   time: number = 0;
   startTime?: Date;
   endTime?: Date;
@@ -105,6 +106,10 @@ export class MainHandler {
     this._yc = Math.round(height / 100);
   }
 
+  calculateTheshold() {
+    this.theshold = Math.max(3, Math.sqrt((this.width / this._xc) ** 2 + (this.height / this._yc) ** 2) / 20);
+  }
+
   init() {
     clearChildren(this.pathGroup);
     clearChildren(this.instanceGroup);
@@ -113,6 +118,7 @@ export class MainHandler {
     this.time = 0;
     this.baseTime = 0;
     this.startTime = new Date();
+    this.calculateTheshold();
     delete this.endTime;
     delete this.resumeTime;
     this.timeDisp.textContent = '--:--';
@@ -200,6 +206,11 @@ export class MainHandler {
       lastElement.classList.remove('draggable');
       lastElement.transform.baseVal.removeItem(0);
     }
+    const viewWidth = Math.max(640, this.width);
+    const viewHeight = Math.max(480, this.height);
+    this.root.setAttribute('viewbox', `0 0 ${viewWidth} ${viewHeight}`);
+    this.root.setAttribute('width', viewWidth.toString(10));
+    this.root.setAttribute('height', viewHeight.toString(10));
     showCertificate(this);
   }
 
@@ -213,7 +224,7 @@ export class MainHandler {
     if(!t2.numberOfItems) return current;
     const m1 = t1.getItem(0).matrix;
     const m2 = t2.getItem(0).matrix;
-    if(Math.sqrt((m1.e - m2.e) ** 2 + (m1.f - m2.f) ** 2) > 3)
+    if(Math.sqrt((m1.e - m2.e) ** 2 + (m1.f - m2.f) ** 2) > this.theshold)
       return current;
     const currentIsGroup = current.classList.contains('group');
     const otherIsGroup = other.classList.contains('group');
@@ -274,6 +285,7 @@ export class MainHandler {
       this.startTime = new Date(data.startTime);
     if(data.endTime != null)
       this.endTime = new Date(data.endTime);
+    this.calculateTheshold();
   }
 
   private save() {
