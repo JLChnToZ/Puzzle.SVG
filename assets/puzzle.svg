@@ -114,6 +114,11 @@
     }
     .draggable .handler, .draggable.handler {
       cursor: move;
+      cursor: grab;
+    }
+    .draggable.grabbing.handler, .draggable.grabbing .handler {
+      cursor: move;
+      cursor: grabbing;
     }
   ]]>
   </style>

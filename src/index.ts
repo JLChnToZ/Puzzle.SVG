@@ -169,7 +169,8 @@ export class MainHandler {
     }
   }
 
-  private onDrag() {
+  private onDrag(element: SVGElement) {
+    element.classList.add('grabbing');
     if(this.timer != null) return;
     this.resumeTime = new Date();
     this.timer = window.setInterval(this.updateTime.bind(this), 1000);
@@ -177,6 +178,7 @@ export class MainHandler {
   }
 
   private onDrop(state: DraggingState) {
+    state.element.classList.remove('grabbing');
     const { id } = state.target.parentNode as Element;
     const m = pathIdMatcher.exec(id);
     if(!m) return;
