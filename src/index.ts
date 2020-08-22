@@ -19,7 +19,7 @@ interface StoredData {
 export class MainHandler {
   document: Document;
   root: SVGSVGElement;
-  defsElement: SVGDefsElement;
+  masksElement: SVGGElement;
   imageElement: SVGImageElement;
   uiGroup: SVGGElement;
   pathGroup: SVGGElement;
@@ -66,7 +66,7 @@ export class MainHandler {
     root.querySelector('.noscript')?.classList.remove('noscript');
     this.root = root.querySelector('svg')!;
     this.document = root instanceof Document ? root : this.root.ownerDocument;
-    this.defsElement = root.querySelector('defs')!;
+    this.masksElement = root.querySelector<SVGGElement>('g#ms')!;
     this.uiGroup = root.querySelector<SVGGElement>('g#ui')!;
     this.pathGroup = root.querySelector<SVGGElement>('g#ps')!;
     this.instanceGroup = root.querySelector<SVGGElement>('g#ins')!;
@@ -117,8 +117,7 @@ export class MainHandler {
   init() {
     clearChildren(this.pathGroup);
     clearChildren(this.instanceGroup);
-    for(const oldMask of this.defsElement.querySelectorAll('mask.puzzle-mask'))
-      oldMask.remove();
+    clearChildren(this.masksElement);
     hideCetificate();
     this.time = 0;
     this.baseTime = 0;
@@ -143,16 +142,17 @@ export class MainHandler {
     this.imageElement.href.baseVal = this.imageUrl;
     this.imageElement.setAttribute('width', this.width.toString());
     this.imageElement.setAttribute('height', this.height.toString());
+    const defs = this.document.createDocumentFragment();
+    const instanceGroup = this.document.createDocumentFragment();
     for(const path of paths) {
-      const mask = this.defsElement.appendChild(this.document.createElementNS(NS_SVG, 'mask'));
+      const mask = defs.appendChild(this.document.createElementNS(NS_SVG, 'mask'));
       mask.id = `${path.id}-m`;
-      mask.classList.add('puzzle-mask');
 
       const maskPath = mask.appendChild(this.document.createElementNS(NS_SVG, 'use'));
       maskPath.href.baseVal = `#${path.id}`;
       maskPath.setAttribute('fill', 'white');
 
-      const instance = this.instanceGroup.appendChild(this.document.createElementNS(NS_SVG, 'g'));
+      const instance = instanceGroup.appendChild(this.document.createElementNS(NS_SVG, 'g'));
       instance.id = `${path.id}-i`;
       instance.classList.add('draggable');
 
@@ -176,6 +176,8 @@ export class MainHandler {
         );
       }
     }
+    this.masksElement.appendChild(defs);
+    this.instanceGroup.appendChild(instanceGroup);
     this.onWindowResize();
   }
 

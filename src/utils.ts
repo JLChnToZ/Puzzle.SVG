@@ -31,6 +31,7 @@ export function getImageDimensions(src: string) {
 }
 
 export function clearChildren(node: Node) {
+  node.textContent = '';
   while(node.hasChildNodes())
     node.removeChild(node.firstChild!);
 }

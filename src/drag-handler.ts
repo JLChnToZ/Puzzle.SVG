@@ -34,7 +34,7 @@ export function registerDraggable(
     if(e.button !== 0) return;
     const target = (e.target as Element)?.closest?.(`${draggableClass} ${handlerClass}, ${draggableClass}${handlerClass}`);
     if(!(target instanceof SVGGraphicsElement)) return;
-    handleStartDrag(target, e, undefined);
+    handleStartDrag(target, e, undefined, e.ctrlKey);
     interceptEvent(e);
   }
 
@@ -81,7 +81,7 @@ export function registerDraggable(
     interceptEvent(e);
   }
 
-  function handleStartDrag(target: SVGGraphicsElement, pointer: MouseEvent | Touch, identifier: number | undefined) {
+  function handleStartDrag(target: SVGGraphicsElement, pointer: MouseEvent | Touch, identifier: number | undefined, forceBringToFront?: boolean) {
     const root = target.ownerSVGElement!;
     const element = target.matches(draggableClass) ? target : target?.closest<SVGGraphicsElement>(draggableClass) as SVGGraphicsElement;
     if(draggingElements.has(element)) return;
@@ -102,7 +102,8 @@ export function registerDraggable(
     };
     draggingElements.set(element, state);
     states.set(identifier, state);
-    element.parentNode?.appendChild(element);
+    if(element.nextSibling && (target.childElementCount < 10 || forceBringToFront))
+      element.parentNode?.appendChild(element);
     onDrag?.(element);
   }
 
