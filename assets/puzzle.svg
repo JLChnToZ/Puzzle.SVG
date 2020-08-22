@@ -46,13 +46,17 @@
           <h3>Start a New Puzzle!</h3>
           <form id="menuform">
             <div>
-              <label>Image: <input id="image-input" type="file" accept="image/*" /></label>
+              <label class="button">
+                &lt;Click to Select Image&gt;
+                <input id="image-input" type="file" accept="image/*" />
+              </label>
             </div>
             <div>
               <label>Puzzle Size: </label>
               <input type="number" class="size-input" id="col-input" size="3" min="1" value="1" />
               <label>×</label>
-              <input type="number" class="size-input" id="row-input" size="3" min="1" value="1" />
+              <input type="number" class="size-input" id="row-input" size="3" min="1" value="1" /><br />
+              <span id="size-count" />
             </div>
             <div class="align-center">
               <button type="submit">Start Game</button>
@@ -106,23 +110,22 @@
     .align-center, h3 {
       text-align: center;
     }
-    .button {
+    label.button input {
+      visibility: hidden;
+      width: 0;
+      height: 0;
+    }
+    a, .button {
       fill: #840;
-    }
-    .button:hover {
-      fill: #F80;
-    }
-    a {
       color: #840;
       text-decoration: none;
-    }
-    a:hover {
-      color: #F80;
     }
     a, button, .button {
       cursor: pointer;
     }
     a:hover, .button:hover {
+      color: #F80;
+      fill: #F80;
       text-decoration: underline dashed;
     }
     .size-input {
@@ -163,6 +166,6 @@
     }
   ]]>
   </style>
-  <script type="application/json" id="data">{}</script>
+  <script type="application/json" id="data" />
   <script type="text/javascript" href="main.js" />
 </svg>

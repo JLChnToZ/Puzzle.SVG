@@ -33,6 +33,7 @@ export class MainHandler {
   imagePreview: HTMLImageElement;
   colSelector: HTMLInputElement;
   rowSelector: HTMLInputElement;
+  sizeCountDisplay: HTMLSpanElement;
 
   imageUrl: string;
   width: number = 1;
@@ -52,7 +53,7 @@ export class MainHandler {
   }
   set xCount(value: number) {
     this._xc = value;
-    this._yc = Math.round(value / this.width * this.height);
+    this._yc = Math.max(1,Math.round(value / this.width * this.height));
   } 
 
   get yCount() {
@@ -60,7 +61,7 @@ export class MainHandler {
   }
   set yCount(value: number) {
     this._yc = value;
-    this._xc = Math.round(value / this.height * this.width);
+    this._xc = Math.max(1, Math.round(value / this.height * this.width));
   }
 
   constructor(root: GlobalEventHandlers & ParentNode = document) {
@@ -90,6 +91,7 @@ export class MainHandler {
     const onRowChange = this.onRowChange.bind(this);
     this.rowSelector.addEventListener('change', onRowChange);
     this.rowSelector.addEventListener('blur', onRowChange);
+    this.sizeCountDisplay = this.menuForm.querySelector<HTMLSpanElement>('#size-count')!;
     this.imagePreview = this.menuForm.querySelector<HTMLImageElement>('img#preview')!;
     this.root.querySelector('#new-game')?.addEventListener('click', this.menu.bind(this));
     this.root.querySelector('#save-game')?.addEventListener('click', this.save.bind(this));
@@ -114,6 +116,7 @@ export class MainHandler {
     this._yc = Math.round(height / 100);
     this.colSelector.valueAsNumber = this.xCount = Math.round(this.width / 100);
     this.rowSelector.valueAsNumber = this.yCount;
+    this.onSizeChange();
     if(this.imagePreview.src.startsWith('blob:'))
       URL.revokeObjectURL(this.imagePreview.src);
     this.imagePreview.src = blobOrSrc instanceof Blob ? URL.createObjectURL(blobOrSrc) : src;
@@ -289,17 +292,18 @@ export class MainHandler {
 
   private menu() {
     this.menuGroup.classList.add('show');
+    this.onSizeChange();
   }
 
   private load() {
     const data: StoredData | null = JSON.parse(this.dataElement.textContent || 'null');
     if(data == null)
       return;
-    this.width = data.width;
-    this.height = data.height;
-    this.baseTime = data.time;
-    this._xc = data.xCount;
-    this._yc = data.yCount;
+    this.width = data.width || 1;
+    this.height = data.height || 1;
+    this.baseTime = data.time || 0;
+    this._xc = data.xCount || 1;
+    this._yc = data.yCount || 1;
     if(data.startTime != null)
       this.startTime = new Date(data.startTime);
     if(data.endTime != null)
@@ -331,11 +335,17 @@ export class MainHandler {
   private onColChange() {
     this.xCount = this.colSelector.valueAsNumber;
     this.rowSelector.valueAsNumber = this.yCount;
+    this.onSizeChange();
   }
 
   private onRowChange() {
     this.yCount = this.rowSelector.valueAsNumber;
     this.colSelector.valueAsNumber = this.xCount;
+    this.onSizeChange();
+  }
+
+  private onSizeChange() {
+    this.sizeCountDisplay.textContent = `(${this._xc * this._yc} Pieces)`;
   }
 
   private async onMenuSubmit(e: Event) {
