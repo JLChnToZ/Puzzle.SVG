@@ -66,8 +66,8 @@ export function registerDraggable(
         for(let i = 0; i < targetTouches.length; i++) {
           const touch = targetTouches[i];
           const lp = getLocalPoint(root, touch, ctm);
-          if(bbox.left <= lp.x && bbox.right > lp.x &&
-            bbox.top <= lp.y && bbox.bottom > lp.y) {
+          if(bbox.x <= lp.x && bbox.x + bbox.width > lp.x &&
+            bbox.y <= lp.y && bbox.y + bbox.height > lp.y) {
             identifier = touch.identifier;
             pointer = touch;
             break;
@@ -125,11 +125,9 @@ export function registerDraggable(
       state.element.ownerSVGElement!, e,
       state.element.parentNode! as SVGGraphicsElement,
     );
-    if(!coord) return false;
-    state.transform.setTranslate(
-      coord.x - state.offsetX,
-      coord.y - state.offsetY,
-    );
+    coord.x -= state.offsetX;
+    coord.y -= state.offsetY;
+    state.transform.setTranslate(coord.x, coord.y);
     return true;
   }
 
