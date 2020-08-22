@@ -96,3 +96,15 @@ export function getSeed(seed: any): number {
   }
   return seed;
 }
+
+export function interceptEvent(e: Event) {
+  if(e.cancelable && !e.defaultPrevented)
+    e.preventDefault();
+  e.stopPropagation();
+}
+
+export function toPromise<S, T>(thisArg: S, src: (this: S, callback: (result: T) => void) => void): Promise<T>;
+export function toPromise(thisArg: any, src: (...args: any[]) => void, ...args: any[]): Promise<any>;
+export function toPromise(thisArg: any, src: (...args: any[]) => void, ...args: any[]) {
+  return new Promise(resolve => src.call(thisArg, ...args, resolve));
+}

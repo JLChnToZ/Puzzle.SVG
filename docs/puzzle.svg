@@ -94,6 +94,12 @@
       max-width: 280px;
       object-fit: contain;
     }
+    #paste-helper {
+      visibility: hidden;
+      width: 0;
+      height: 0;
+      border: none;
+    }
     #menuform div {
       padding: 0.5em;
     }

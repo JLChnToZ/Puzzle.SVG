@@ -1,8 +1,9 @@
 import { JigsawGenerator } from './puzzle-generator';
 import { registerDraggable, DraggingState } from './drag-handler';
-import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG } from './utils';
+import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG, toPromise, interceptEvent } from './utils';
 import { downloadDocument } from './xml-clone';
 import { showCertificate, hideCetificate } from './certificate';
+import { registerDropZone } from './dropzone';
 
 const pathIdMatcher = /^p-(\d+)-(\d+)/;
 
@@ -65,6 +66,7 @@ export class MainHandler {
   constructor(root: GlobalEventHandlers & ParentNode = document) {
     root.querySelector('.noscript')?.classList.remove('noscript');
     this.root = root.querySelector('svg')!;
+    registerDropZone(this.root);
     this.document = root instanceof Document ? root : this.root.ownerDocument;
     this.masksElement = root.querySelector<SVGGElement>('g#ms')!;
     this.uiGroup = root.querySelector<SVGGElement>('g#ui')!;
@@ -76,6 +78,8 @@ export class MainHandler {
     this.menuForm = root.querySelector<HTMLFormElement>('form#menuform')!;
     this.menuForm.addEventListener('submit', this.onMenuSubmit.bind(this));
     this.menuForm.addEventListener('reset', this.onMenuReset.bind(this));
+    this.root.addEventListener('paste', this.onPaste.bind(this), true);
+    registerDropZone(this.root.querySelector<SVGElement>('#menu')!, this.onDragDrop.bind(this));
     this.imageSelector = this.menuForm.querySelector<HTMLInputElement>('input#image-input')!;
     this.imageSelector.addEventListener('change', this.onImageSelected.bind(this));
     this.colSelector = this.menuForm.querySelector<HTMLInputElement>('input#col-input')!;
@@ -99,15 +103,20 @@ export class MainHandler {
     this.onWindowResize();
   }
 
-  async updateImage(src: string | Blob) {
-    if(src instanceof Blob)
-      src = await getUrl(src);
+  async updateImage(blobOrSrc: string | Blob) {
+    console.log('Load image', blobOrSrc);
+    const src = blobOrSrc instanceof Blob ? await getUrl(blobOrSrc) : blobOrSrc;
     const { width, height } = await getImageDimensions(src);
     this.imageUrl = src;
     this.width = width;
     this.height = height;
     this._xc = Math.round(width / 100);
     this._yc = Math.round(height / 100);
+    this.colSelector.valueAsNumber = this.xCount = Math.round(this.width / 100);
+    this.rowSelector.valueAsNumber = this.yCount;
+    if(this.imagePreview.src.startsWith('blob:'))
+      URL.revokeObjectURL(this.imagePreview.src);
+    this.imagePreview.src = blobOrSrc instanceof Blob ? URL.createObjectURL(blobOrSrc) : src;
   }
 
   calculateTheshold() {
@@ -312,16 +321,11 @@ export class MainHandler {
     return downloadDocument(this.root, `puzzle-${Date.now()}.svg`, beforeSave);
   }
 
-  private async onImageSelected() {
+  private onImageSelected() {
     const { files } = this.imageSelector;
     if(!files || !files.length) return;
     const file = files.item(0)!;
-    await this.updateImage(file);
-    this.colSelector.valueAsNumber = this.xCount = Math.round(this.width / 100);
-    this.rowSelector.valueAsNumber = this.yCount;
-    if(this.imagePreview.src.startsWith('blob:'))
-      URL.revokeObjectURL(this.imagePreview.src);
-    this.imagePreview.src = URL.createObjectURL(file);
+    this.updateImage(file);
   }
 
   private onColChange() {
@@ -352,6 +356,45 @@ export class MainHandler {
     const viewBox = this.root.viewBox.baseVal;
     const scale = Math.max(viewBox.width / window.innerWidth, viewBox.height / window.innerHeight);
     this.uiGroup.transform.baseVal.getItem(0).setScale(scale, scale);
+  }
+
+  private onPaste(e: ClipboardEvent) {
+    if(this.menuGroup.classList.contains('show') && e.clipboardData && e.clipboardData.files.length) {
+      interceptEvent(e);
+      this.onDragDrop(e.clipboardData);
+    }
+  }
+
+  private async onDragDrop(dataTransfer: DataTransfer) {
+    let loaded = false;
+    for(const item of dataTransfer.items) {
+      switch(item.kind) {
+        case 'file': {
+          if(!item.type.startsWith('image/')) break;
+          const file = item.getAsFile();
+          if(!file) break;
+          try {
+            this.updateImage(file);
+            loaded = true;
+          } catch {}
+          break;
+        }
+        case 'string':
+          switch(item.type) {
+            case 'text/uri-list':
+              for(const row of (await toPromise(item, item.getAsString)).split('\r\n'))
+                try {
+                  await this.updateImage(await (await fetch(row)).blob());
+                  loaded = true;
+                  break;
+                } catch {}
+              break;
+          }
+          break;
+      }
+      if(loaded) break;
+    }
+    return loaded;
   }
 }
 

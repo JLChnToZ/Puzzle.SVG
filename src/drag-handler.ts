@@ -1,3 +1,5 @@
+import { interceptEvent } from './utils';
+
 export interface DraggingState {
   target: SVGGraphicsElement;
   element: SVGGraphicsElement;
@@ -173,10 +175,4 @@ function getLocalPoint(
     base.getScreenCTM()!.inverse() :
     base,
   ) : p;
-}
-
-function interceptEvent(e: Event) {
-  if(e.cancelable && !e.defaultPrevented)
-    e.preventDefault();
-  e.stopPropagation();
 }
