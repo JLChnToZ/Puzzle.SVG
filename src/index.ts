@@ -312,7 +312,7 @@ export class MainHandler {
   }
 
   private save() {
-    if(this.resumeTime != null) this.updateTime();
+    if(this.resumeTime != null && this.endTime == null) this.updateTime();
     this.dataElement.textContent = JSON.stringify({
       width: this.width,
       height: this.height,
