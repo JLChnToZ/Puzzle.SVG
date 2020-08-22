@@ -21,6 +21,7 @@ export class MainHandler {
   root: SVGSVGElement;
   defsElement: SVGDefsElement;
   imageElement: SVGImageElement;
+  uiGroup: SVGGElement;
   pathGroup: SVGGElement;
   instanceGroup: SVGGElement;
   timeDisp: SVGTextElement;
@@ -66,6 +67,7 @@ export class MainHandler {
     this.root = root.querySelector('svg')!;
     this.document = root instanceof Document ? root : this.root.ownerDocument;
     this.defsElement = root.querySelector('defs')!;
+    this.uiGroup = root.querySelector<SVGGElement>('g#ui')!;
     this.pathGroup = root.querySelector<SVGGElement>('g#ps')!;
     this.instanceGroup = root.querySelector<SVGGElement>('g#ins')!;
     this.timeDisp = root.querySelector<SVGTextElement>('text#time')!;
@@ -89,10 +91,12 @@ export class MainHandler {
     this.root.querySelector('#save-game')?.addEventListener('click', this.save.bind(this));
     this.imageElement = root.querySelector<SVGImageElement>('image#img')!;
     this.imageUrl = this.imageElement.href.baseVal;
+    window.addEventListener('resize', this.onWindowResize.bind(this));
     Object.assign(this, registerDraggable(
       root, this.onDrag.bind(this), this.onDrop.bind(this),
     ));
     this.load();
+    this.onWindowResize();
   }
 
   async updateImage(src: string | Blob) {
@@ -172,6 +176,7 @@ export class MainHandler {
         );
       }
     }
+    this.onWindowResize();
   }
 
   private onDrag(element: SVGElement) {
@@ -205,9 +210,10 @@ export class MainHandler {
       lastElement.classList.remove('draggable');
       lastElement.transform.baseVal.removeItem(0);
     }
-    const viewWidth = Math.max(640, this.width);
-    const viewHeight = Math.max(480, this.height);
+    const viewWidth = Math.max(640, this.width + 20);
+    const viewHeight = Math.max(480, this.height + 40);
     this.root.setAttribute('viewBox', `0 0 ${viewWidth} ${viewHeight}`);
+    this.onWindowResize();
     showCertificate(this);
   }
 
@@ -226,14 +232,19 @@ export class MainHandler {
     const currentIsGroup = current.classList.contains('group');
     const otherIsGroup = other.classList.contains('group');
     if(currentIsGroup) {
-      if(otherIsGroup) {
-        for(const child of Array.from(other.childNodes))
-          current.appendChild(child);
-        other.remove();
-      } else {
+      if(!otherIsGroup) {
         other.classList.remove('draggable');
         t2.removeItem(0);
         current.appendChild(other);
+      } else if(other.childElementCount > current.childElementCount) {
+        for(const child of Array.from(current.childNodes))
+          other.appendChild(child);
+        current.remove();
+        return other;
+      } else {
+        for(const child of Array.from(other.childNodes))
+          current.appendChild(child);
+        other.remove();
       }
       return current;
     }
@@ -296,7 +307,7 @@ export class MainHandler {
       endTime: this.endTime?.getTime(),
       time: this.time,
     } as StoredData);
-    return downloadDocument(this.root, `puzzle-${Date.now()}.svg`);
+    return downloadDocument(this.root, `puzzle-${Date.now()}.svg`, beforeSave);
   }
 
   private async onImageSelected() {
@@ -334,6 +345,17 @@ export class MainHandler {
     this.imagePreview.src = '';
     this.menuGroup.classList.remove('show');
   }
+
+  private onWindowResize() {
+    const viewBox = this.root.viewBox.baseVal;
+    const scale = Math.max(viewBox.width / window.innerWidth, viewBox.height / window.innerHeight);
+    this.uiGroup.transform.baseVal.getItem(0).setScale(scale, scale);
+  }
 }
 
 new MainHandler();
+
+function beforeSave(root: Element) {
+  root.classList.add('noscript');
+  root.querySelector<SVGGElement>('g#ui')?.transform.baseVal.getItem(0)?.setScale(1, 1);
+}
