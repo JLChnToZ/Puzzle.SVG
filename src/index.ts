@@ -1,6 +1,6 @@
 import { JigsawGenerator } from './puzzle-generator';
 import { registerDraggable, DraggingState } from './drag-handler';
-import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG, toPromise, interceptEvent } from './utils';
+import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG, toPromise, interceptEvent, transferChildren } from './utils';
 import { downloadDocument } from './xml-clone';
 import { showCertificate, hideCetificate } from './certificate';
 import { registerDropZone } from './dropzone';
@@ -251,13 +251,11 @@ export class MainHandler {
         t2.removeItem(0);
         current.appendChild(other);
       } else if(other.childElementCount > current.childElementCount) {
-        for(const child of Array.from(current.childNodes))
-          other.appendChild(child);
+        transferChildren(current, other);
         current.remove();
         return other;
       } else {
-        for(const child of Array.from(other.childNodes))
-          current.appendChild(child);
+        transferChildren(other, current);
         other.remove();
       }
       return current;

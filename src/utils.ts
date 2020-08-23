@@ -97,6 +97,13 @@ export function getSeed(seed: any): number {
   return seed;
 }
 
+export function transferChildren(src: Element, dest: Element) {
+  if(!src.childElementCount) return;
+  const frag = src.ownerDocument.createDocumentFragment();
+  Array.from(src.childNodes).forEach(frag.appendChild, frag);
+  dest.appendChild(frag);
+}
+
 export function interceptEvent(e: Event) {
   if(e.cancelable && !e.defaultPrevented)
     e.preventDefault();

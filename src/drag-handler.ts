@@ -104,7 +104,7 @@ export function registerDraggable(
     };
     draggingElements.set(element, state);
     states.set(identifier, state);
-    if(element.nextSibling && (target.childElementCount < 10 || forceBringToFront))
+    if(element.nextSibling && (element.childElementCount < 10 || forceBringToFront))
       element.parentNode?.appendChild(element);
     onDrag?.(element);
   }
