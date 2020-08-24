@@ -7,6 +7,13 @@ export interface DraggingState {
   transform: SVGTransform;
   offsetX: number;
   offsetY: number;
+  bringToFrontAfter?: boolean;
+}
+
+interface Pointer {
+  clientX: number;
+  clientY: number;
+  identifier?: number;
 }
 
 export function registerDraggable(
@@ -27,65 +34,39 @@ export function registerDraggable(
   root.addEventListener('touchend', onTouchEndDrag, { passive: false });
   root.addEventListener('touchcancel', onTouchEndDrag, { passive: false });
 
-  function getState(e: MouseEvent | Touch) {
-    const state = states.get((e as Touch).identifier);
+  function getState(e: Pointer) {
+    const state = states.get(e.identifier);
     return state && (state.identifier == null) === (e instanceof MouseEvent) ? state : null;
+  }
+
+  function getHandlerTarget(e: Event) {
+    let { target } = e;
+    if(!(target instanceof Element)) return;
+    target = target.closest(`${draggableClass} ${handlerClass}, ${draggableClass}${handlerClass}`);
+    if(target instanceof SVGGraphicsElement)
+      return target;
   }
 
   function onMouseStartDrag(e: MouseEvent) {
     if(e.button !== 0) return;
-    const target = (e.target as Element)?.closest?.(`${draggableClass} ${handlerClass}, ${draggableClass}${handlerClass}`);
-    if(!(target instanceof SVGGraphicsElement)) return;
-    handleStartDrag(target, e, undefined, e.ctrlKey);
+    const target = getHandlerTarget(e);
+    if(!target) return;
+    handleStartDrag(target, e, e.ctrlKey || e.shiftKey);
     interceptEvent(e);
   }
 
   function onTouchStartDrag(e: TouchEvent) {
-    const target = (e.target as Element)?.closest?.(`${draggableClass} ${handlerClass}, ${draggableClass}${handlerClass}`);
-    if(!(target instanceof SVGGraphicsElement)) return;
-    const root = target.ownerSVGElement!;
-    let pointer: Touch | undefined;
-    let identifier: number | undefined;
-    const { targetTouches } = e as TouchEvent;
-    let srcElement: Element | null | undefined = target;
-    const ctm = (target.parentNode as SVGGraphicsElement)?.getScreenCTM?.()?.inverse();
-    while(srcElement) {
-      if(srcElement instanceof SVGUseElement) {
-        srcElement = srcElement.instanceRoot?.correspondingElement;
-        continue;
-      } if(srcElement instanceof SVGGeometryElement) {
-        for(let i = 0; i < targetTouches.length; i++) {
-          const touch = targetTouches[i];
-          const lp = getLocalPoint(root, touch, ctm);
-          if(srcElement.isPointInFill(lp) || srcElement.isPointInStroke(lp)) {
-            identifier = touch.identifier;
-            pointer = touch;
-            break;
-          }
-        }
-      } else if(srcElement instanceof SVGGraphicsElement) {
-        const bbox = target.getBBox();
-        for(let i = 0; i < targetTouches.length; i++) {
-          const touch = targetTouches[i];
-          const lp = getLocalPoint(root, touch, ctm);
-          if(bbox.x <= lp.x && bbox.x + bbox.width > lp.x &&
-            bbox.y <= lp.y && bbox.y + bbox.height > lp.y) {
-            identifier = touch.identifier;
-            pointer = touch;
-            break;
-          }
-        }
-      }
-      break;
-    }
+    const pointer = e.targetTouches.item(0);
     if(!pointer) return;
-    handleStartDrag(target, pointer, identifier);
+    const target = getHandlerTarget(e);
+    if(!target) return;
+    handleStartDrag(target, pointer, e.ctrlKey || e.shiftKey);
     interceptEvent(e);
   }
 
-  function handleStartDrag(target: SVGGraphicsElement, pointer: MouseEvent | Touch, identifier: number | undefined, forceBringToFront?: boolean) {
+  function handleStartDrag(target: SVGGraphicsElement, pointer: Pointer, forceBringToFront?: boolean) {
     const root = target.ownerSVGElement!;
-    const element = target.matches(draggableClass) ? target : target?.closest<SVGGraphicsElement>(draggableClass) as SVGGraphicsElement;
+    const element = target.matches(draggableClass) ? target : target.closest<SVGGraphicsElement>(draggableClass) as SVGGraphicsElement;
     if(draggingElements.has(element)) return;
     const transforms = element.transform.baseVal;
     if(!transforms.numberOfItems || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
@@ -97,6 +78,7 @@ export function registerDraggable(
     const offset = getLocalPoint(
       root, pointer, element.parentNode! as SVGGraphicsElement,
     ).matrixTransform(transform.matrix.inverse());
+    const { identifier } = pointer;
     const state: DraggingState = {
       element, target, identifier, transform,
       offsetX: offset.x,
@@ -104,8 +86,10 @@ export function registerDraggable(
     };
     draggingElements.set(element, state);
     states.set(identifier, state);
-    if(element.nextSibling && (element.childElementCount < 10 || forceBringToFront))
+    if(element.nextSibling && forceBringToFront)
       element.parentNode?.appendChild(element);
+    else
+      state.bringToFrontAfter = true;
     onDrag?.(element);
   }
 
@@ -121,7 +105,7 @@ export function registerDraggable(
       interceptEvent(e);
   }
   
-  function handleDrag(e: MouseEvent | Touch) {
+  function handleDrag(e: Pointer) {
     const state = getState(e);
     if(!state) return false;
     const coord = getLocalPoint(
@@ -146,11 +130,13 @@ export function registerDraggable(
       interceptEvent(e);
   }
   
-  function handleEndDrag(e: MouseEvent | Touch) {
+  function handleEndDrag(e: Pointer) {
     const state = getState(e);
     if(!state) return false;
     draggingElements.delete(state.element);
     states.delete(state.identifier);
+    if(state.bringToFrontAfter)
+      state.element.parentNode?.appendChild(state.element);
     onDrop?.(state);
     return true;
   }
@@ -164,7 +150,7 @@ export function registerDraggable(
 
 function getLocalPoint(
   root: SVGSVGElement,
-  pointer: MouseEvent | Touch,
+  pointer: Pointer,
   base?: DOMMatrix | SVGGraphicsElement | null,
 ) {
   const p = root.createSVGPoint();
