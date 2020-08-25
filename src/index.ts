@@ -383,7 +383,7 @@ export class MainHandler {
     }
     const viewRatio = viewWidth / viewHeight;
     const windowRatio = window.innerWidth / window.innerHeight;
-    const scale = (viewRatio > windowRatio ? viewHeight / window.innerHeight : viewWidth / window.innerWidth) * window.devicePixelRatio;
+    const scale = (viewRatio > windowRatio ? viewWidth / window.innerWidth : viewHeight / window.innerHeight) * window.devicePixelRatio;
     this.uiGroup.transform.baseVal.getItem(0).setScale(scale, scale);
   }
 
