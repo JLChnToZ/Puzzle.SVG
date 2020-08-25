@@ -190,6 +190,7 @@ export class MainHandler {
     }
     this.masksElement.appendChild(defs);
     this.instanceGroup.appendChild(instanceGroup);
+    this.serializeToData();
     this.onWindowResize();
   }
 
@@ -309,7 +310,7 @@ export class MainHandler {
     this.calculateTheshold();
   }
 
-  private save() {
+  private serializeToData() {
     if(this.resumeTime != null && this.endTime == null) this.updateTime();
     this.dataElement.textContent = JSON.stringify({
       width: this.width,
@@ -320,6 +321,10 @@ export class MainHandler {
       endTime: this.endTime?.getTime(),
       time: this.time,
     } as StoredData);
+  }
+
+  private save() {
+    this.serializeToData();
     return downloadDocument(this.root, `puzzle-${Date.now()}.svg`, beforeSave);
   }
 
@@ -361,8 +366,24 @@ export class MainHandler {
   }
 
   private onWindowResize() {
-    const viewBox = this.root.viewBox.baseVal;
-    const scale = Math.max(viewBox.width / window.innerWidth, viewBox.height / window.innerHeight);
+    let viewWidth: number, viewHeight: number;
+    if(!this.dataElement.textContent) {
+      if(window.innerWidth > window.innerHeight) {
+        viewHeight = 480;
+        viewWidth = viewHeight / window.innerHeight * window.innerWidth;
+      } else {
+        viewWidth = 640;
+        viewHeight = viewWidth / window.innerWidth * window.innerHeight;
+      }
+      this.root.setAttribute('viewBox', `0 0 ${viewWidth} ${viewHeight}`);
+    } else {
+      const viewBox = this.root.viewBox.baseVal;
+      viewWidth = viewBox.width;
+      viewHeight = viewBox.height;
+    }
+    const viewRatio = viewWidth / viewHeight;
+    const windowRatio = window.innerWidth / window.innerHeight;
+    const scale = (viewRatio > windowRatio ? viewHeight / window.innerHeight : viewWidth / window.innerWidth) * window.devicePixelRatio;
     this.uiGroup.transform.baseVal.getItem(0).setScale(scale, scale);
   }
 
