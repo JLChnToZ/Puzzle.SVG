@@ -143,8 +143,9 @@ export class JigsawGenerator {
     this.strokes.clear();
   }
 
-  toSvgElements(document: Document, parent?: SVGElement) {
+  toSvgElements(document: Document, parent?: Node) {
     const result: SVGPathElement[] = [];
+    const fragment = parent != null ? document.createDocumentFragment() : null;
     for(let y = 0; y < this.cells.length; y++) {
       const row = this.cells[y];
       for(let x = 0; x < row.length; x++) {
@@ -152,9 +153,10 @@ export class JigsawGenerator {
         elm.setAttribute('d', row[x]);
         elm.id = `p-${x}-${y}`;
         result.push(elm);
-        parent?.appendChild(elm);
+        fragment?.appendChild(elm);
       }
     }
+    parent?.appendChild(fragment!);
     return result;
   }
 
