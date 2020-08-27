@@ -20,8 +20,29 @@ const svgArgsCount: { [arg: string]: number; } = {
   z: 0,
 };
 
+export interface JigsawGeneratorOptions {
+  width: number;
+  height: number;
+  xCount: number;
+  yCount: number;
+  seed?: any;
+  tabSize?: number;
+  jitter?: number;
+  radius?: number;
+  fixedPattern?: boolean;
+}
+
 export class JigsawGenerator {
   cells: string[][];
+  width: number;
+  height: number;
+  xCount: number;
+  yCount: number;
+  seed: number;
+  tabSize: number;
+  jitter: number;
+  radius: number;
+  fixedPattern: number;
 
   private strokes = new Map<number, Stroke[]>();
   private a: number = 0;
@@ -38,18 +59,16 @@ export class JigsawGenerator {
   private get ol() { return this.sl * (this.vertical ? this.yi : this.xi); }
   private get ow() { return this.sw * (this.vertical ? this.xi : this.yi); }
 
-  constructor(
-    public width: number,
-    public height: number,
-    public xCount: number,
-    public yCount: number,
-    public seed?: any,
-    public tabSize: number = 0.1,
-    public jitter: number = 0.04,
-    public radius: number = 0,
-  ) {
-    this.seed = getSeed(seed ?? Math.trunc(Math.random() * Number.MAX_SAFE_INTEGER));
-    this.radius = Math.min(this.radius, this.sl, this.sw);
+  constructor(options: JigsawGeneratorOptions) {
+    this.width = options.width;
+    this.height = options.height;
+    this.xCount = options.xCount;
+    this.yCount = options.yCount;
+    this.tabSize = options.tabSize ?? 0.1;
+    this.jitter = options.jitter ?? 0.04;
+    this.seed = getSeed(options.seed ?? Math.trunc(Math.random() * Number.MAX_SAFE_INTEGER));
+    this.radius = Math.min(options.radius ?? 0, this.sl, this.sw);
+    this.fixedPattern = options.fixedPattern ? Math.floor(this.random() * 2 + 1) : 0;
 
     this.vertical = false;
     for(this.yi = 1; this.yi < this.yCount; this.yi++) {
@@ -198,7 +217,14 @@ export class JigsawGenerator {
 
   private next() {
     const filp = this.flip;
-    this.flip = this.random() >= 0.5;
+    switch(this.fixedPattern) {
+      case 1: case 2:
+        this.flip = (this.xi + this.yi) % 2 === (this.fixedPattern + (this.vertical ? 1 : 0)) % 2;
+        break;
+      default:
+        this.flip = this.random() >= 0.5;
+        break;
+    }
     this.a = (this.flip === filp ? -this.e : this.e);
     this.b = this.nextJitter();
     this.c = this.nextJitter();

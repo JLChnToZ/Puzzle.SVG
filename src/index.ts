@@ -33,6 +33,7 @@ export class MainHandler {
   imagePreview: HTMLImageElement;
   colSelector: HTMLInputElement;
   rowSelector: HTMLInputElement;
+  fixedPatternCheckbox: HTMLInputElement;
   sizeCountDisplay: HTMLSpanElement;
 
   imageUrl: string;
@@ -92,6 +93,7 @@ export class MainHandler {
     this.rowSelector.addEventListener('change', onRowChange);
     this.rowSelector.addEventListener('blur', onRowChange);
     this.sizeCountDisplay = this.menuForm.querySelector<HTMLSpanElement>('#size-count')!;
+    this.fixedPatternCheckbox = this.menuForm.querySelector<HTMLInputElement>('input#fixed-pattern')!;
     this.imagePreview = this.menuForm.querySelector<HTMLImageElement>('img#preview')!;
     this.root.querySelector('#new-game')?.addEventListener('click', this.menu.bind(this));
     this.root.querySelector('#save-game')?.addEventListener('click', this.save.bind(this));
@@ -142,12 +144,14 @@ export class MainHandler {
       clearInterval(this.timer);
       delete this.timer;
     }
-    const paths = new JigsawGenerator(
-      this.width, this.height,
-      this._xc, this._yc,
-      undefined, undefined, undefined,
-      10,
-    ).toSvgElements(this.document, this.pathGroup);
+    const paths = new JigsawGenerator({
+      width: this.width,
+      height: this.height,
+      xCount: this._xc,
+      yCount: this._yc,
+      radius: Math.min(this.width / this._xc, this.height / this._yc) / 5,
+      fixedPattern: this.fixedPatternCheckbox.checked,
+    }).toSvgElements(this.document, this.pathGroup);
     const viewWidth = Math.max(640, this.width * 1.5);
     const viewHeight = Math.max(480, this.height * 1.5);
     this.root.setAttribute('viewBox', `0 0 ${viewWidth} ${viewHeight}`);
