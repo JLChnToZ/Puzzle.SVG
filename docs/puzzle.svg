@@ -280,6 +280,7 @@
     button {
       position: relative;
       color: black;
+      background-color: #A86;
       background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), transparent);
       box-shadow: 0.05em 0.05em 0.1em rgba(255, 255, 255, 0.9) inset, -0.05em -0.05em 0.1em rgba(0, 0, 0, 0.35) inset;
       text-shadow: 0.05em 0.05em 0.02em rgba(255, 255, 255, 0.9);
