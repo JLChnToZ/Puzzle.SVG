@@ -12,14 +12,162 @@
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="5" />
       <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
     </filter>
+    <radialGradient id="menufade" cx="0" cy="0" fr="1">
+      <stop offset="0%" stop-color="#FFF0" />
+      <stop offset="100%" stop-color="#FFF8" />
+    </radialGradient>
+    <linearGradient id="wood1" x1="500%" x2="0" y1="0" y2="0" spreadMethod="repeat">
+      <stop offset="0%" stop-color="#eec48780" />
+      <stop offset="3%" stop-color="#f3cf9a80" />
+      <stop offset="6%" stop-color="#f8d8a280" />
+      <stop offset="6%" stop-color="#f3cf9a80" />
+      <stop offset="9%" stop-color="#f3cf9a80" />
+      <stop offset="12%" stop-color="#f1ca8880" />
+      <stop offset="15%" stop-color="#f3cf9a80" />
+      <stop offset="17%" stop-color="#f4d09e80" />
+      <stop offset="19%" stop-color="#f3cf9a80" />
+      <stop offset="21%" stop-color="#f3cf9a80" />
+      <stop offset="23%" stop-color="#faddb080" />
+      <stop offset="25%" stop-color="#faddb080" />
+      <stop offset="27%" stop-color="#f3cf9a80" />
+      <stop offset="29%" stop-color="#eec88a80" />
+      <stop offset="29%" stop-color="#f3cf9a80" />
+      <stop offset="32%" stop-color="#f3cf9a80" />
+      <stop offset="34%" stop-color="#f3cf9a80" />
+      <stop offset="37%" stop-color="#f3cf9a80" />
+      <stop offset="40%" stop-color="#faddb080" />
+      <stop offset="43%" stop-color="#faddb080" />
+      <stop offset="43%" stop-color="#f3cf9a80" />
+      <stop offset="44%" stop-color="#f3cf9a80" />
+      <stop offset="47%" stop-color="#f3cf9a80" />
+      <stop offset="49%" stop-color="#eec88a80" />
+      <stop offset="52%" stop-color="#f3cf9a80" />
+      <stop offset="54%" stop-color="#faddb080" />
+      <stop offset="56%" stop-color="#f4d09e80" />
+      <stop offset="59%" stop-color="#f3cf9a80" />
+      <stop offset="61%" stop-color="#f4d09e80" />
+      <stop offset="64%" stop-color="#faddb080" />
+      <stop offset="64%" stop-color="#f3cf9a80" />
+      <stop offset="66%" stop-color="#f4d09e80" />
+      <stop offset="69%" stop-color="#f3cf9a80" />
+      <stop offset="71%" stop-color="#f8d8a280" />
+      <stop offset="74%" stop-color="#f3cf9a80" />
+      <stop offset="76%" stop-color="#f3cf9a80" />
+      <stop offset="77%" stop-color="#f3cf9a80" />
+      <stop offset="80%" stop-color="#f3cf9a80" />
+      <stop offset="81%" stop-color="#faddb080" />
+      <stop offset="83%" stop-color="#f3cf9a80" />
+      <stop offset="83%" stop-color="#faddb080" />
+      <stop offset="85%" stop-color="#faddb080" />
+      <stop offset="87%" stop-color="#f3cf9a80" />
+      <stop offset="89%" stop-color="#faddb080" />
+      <stop offset="91%" stop-color="#faddb080" />
+      <stop offset="92%" stop-color="#f3cf9a80" />
+      <stop offset="96%" stop-color="#f8d8a280" />
+      <stop offset="97%" stop-color="#f3cf9a80" />
+      <stop offset="97%" stop-color="#f3cf9a80" />
+      <stop offset="98%" stop-color="#f3cf9a80" />
+      <stop offset="100%" stop-color="#f3cf9a80" />
+    </linearGradient>
+    <linearGradient id="wood2" x1="0" x2="30%" y1="0" y2="0" spreadMethod="repeat">
+      <stop offset="0%" stop-color="#eec4874d" />
+      <stop offset="3%" stop-color="#f3cf9a4d" />
+      <stop offset="6%" stop-color="#f8d8a24d" />
+      <stop offset="6%" stop-color="#f3cf9a4d" />
+      <stop offset="9%" stop-color="#f3cf9a4d" />
+      <stop offset="12%" stop-color="#f1ca884d" />
+      <stop offset="15%" stop-color="#f3cf9a4d" />
+      <stop offset="17%" stop-color="#f4d09e4d" />
+      <stop offset="19%" stop-color="#f3cf9a4d" />
+      <stop offset="21%" stop-color="#f3cf9a4d" />
+      <stop offset="23%" stop-color="#faddb04d" />
+      <stop offset="25%" stop-color="#faddb04d" />
+      <stop offset="27%" stop-color="#f3cf9a4d" />
+      <stop offset="29%" stop-color="#eec88a4d" />
+      <stop offset="29%" stop-color="#f3cf9a4d" />
+      <stop offset="32%" stop-color="#f3cf9a4d" />
+      <stop offset="34%" stop-color="#f3cf9a4d" />
+      <stop offset="37%" stop-color="#f3cf9a4d" />
+      <stop offset="40%" stop-color="#faddb04d" />
+      <stop offset="43%" stop-color="#faddb04d" />
+      <stop offset="43%" stop-color="#f3cf9a4d" />
+      <stop offset="44%" stop-color="#f3cf9a4d" />
+      <stop offset="47%" stop-color="#f3cf9a4d" />
+      <stop offset="49%" stop-color="#eec88a4d" />
+      <stop offset="52%" stop-color="#f3cf9a4d" />
+      <stop offset="54%" stop-color="#faddb04d" />
+      <stop offset="56%" stop-color="#f4d09e4d" />
+      <stop offset="59%" stop-color="#f3cf9a4d" />
+      <stop offset="61%" stop-color="#f4d09e4d" />
+      <stop offset="64%" stop-color="#faddb04d" />
+      <stop offset="64%" stop-color="#f3cf9a4d" />
+      <stop offset="66%" stop-color="#f4d09e4d" />
+      <stop offset="69%" stop-color="#f3cf9a4d" />
+      <stop offset="71%" stop-color="#f8d8a24d" />
+      <stop offset="74%" stop-color="#f3cf9a4d" />
+      <stop offset="76%" stop-color="#f3cf9a4d" />
+      <stop offset="77%" stop-color="#f3cf9a4d" />
+      <stop offset="80%" stop-color="#f3cf9a4d" />
+      <stop offset="81%" stop-color="#faddb04d" />
+      <stop offset="83%" stop-color="#f3cf9a4d" />
+      <stop offset="83%" stop-color="#faddb04d" />
+      <stop offset="85%" stop-color="#faddb04d" />
+      <stop offset="87%" stop-color="#f3cf9a4d" />
+      <stop offset="89%" stop-color="#faddb04d" />
+      <stop offset="91%" stop-color="#faddb04d" />
+      <stop offset="92%" stop-color="#f3cf9a4d" />
+      <stop offset="96%" stop-color="#f8d8a24d" />
+      <stop offset="97%" stop-color="#f3cf9a4d" />
+      <stop offset="97%" stop-color="#f3cf9a4d" />
+      <stop offset="98%" stop-color="#f3cf9a4d" />
+      <stop offset="100%" stop-color="#f3cf9a4d" />
+    </linearGradient>
+    <linearGradient id="wood3" x1="2%" x2="0" y1="0" y2="0" spreadMethod="repeat">
+      <stop offset="0%" stop-color="#eec4874d" />
+      <stop offset="3%" stop-color="#f3cf9a4d" />
+      <stop offset="49%" stop-color="#eec88a4d" />
+      <stop offset="52%" stop-color="#f3cf9a4d" />
+      <stop offset="54%" stop-color="#faddb04d" />
+      <stop offset="56%" stop-color="#f4d09e4d" />
+      <stop offset="59%" stop-color="#f3cf9a33" />
+      <stop offset="61%" stop-color="#f4d09e4d" />
+      <stop offset="64%" stop-color="#faddb04d" />
+      <stop offset="64%" stop-color="#f3cf9a4d" />
+      <stop offset="66%" stop-color="#f4d09e4d" />
+      <stop offset="69%" stop-color="#f3cf9a4d" />
+      <stop offset="71%" stop-color="#f8d8a24d" />
+      <stop offset="74%" stop-color="#f3cf9a4d" />
+      <stop offset="76%" stop-color="#f3cf9a4d" />
+      <stop offset="77%" stop-color="#f3cf9a4d" />
+      <stop offset="80%" stop-color="#f3cf9a4d" />
+      <stop offset="81%" stop-color="#faddb04d" />
+      <stop offset="83%" stop-color="#f3cf9a4d" />
+      <stop offset="83%" stop-color="#faddb04d" />
+      <stop offset="85%" stop-color="#faddb04d" />
+      <stop offset="87%" stop-color="#f3cf9a4d" />
+      <stop offset="89%" stop-color="#faddb04d" />
+      <stop offset="91%" stop-color="#faddb04d" />
+      <stop offset="92%" stop-color="#f3cf9a4d" />
+      <stop offset="96%" stop-color="#f8d8a24d" />
+      <stop offset="97%" stop-color="#f3cf9a4d" />
+      <stop offset="97%" stop-color="#f3cf9a4d" />
+      <stop offset="98%" stop-color="#f3cf9a4d" />
+      <stop offset="100%" stop-color="#f3cf9a4d" />
+    </linearGradient>
+    <pattern id="wood" width="150" height="1" patternUnits="userSpaceOnUse">
+      <rect width="100%" height="100%" fill="#211600" />
+      <rect width="100%" height="100%" fill="url(#wood1)" />
+      <rect width="100%" height="100%" fill="url(#wood2)" />
+      <rect width="100%" height="100%" fill="url(#wood3)" />
+    </pattern>
   </defs>
   <g transform="translate(10, 30)">
-    <rect x="-10" y="-30" width="100%" height="100%" fill="#FFF" stroke-width="0" />
+    <rect x="-10" y="-30" width="100%" height="100%" fill="url(#wood)" stroke-width="0" />
     <g id="ins"></g>
   </g>
   <g id="ui" transform="scale(1)">
     <g id="hud">
-      <rect x="0" y="0" width="640" height="20" stroke-width="0" fill="#FFF8" />
+      <rect x="0" y="0" width="450" height="30" stroke-width="0" fill="url(#menufade)" pointer-events="none" />
       <text id="time" x="10" y="20">--:--</text>
       <text id="new-game" class="button noscript-hidden" x="100" y="20">New Game</text>
       <text id="save-game" class="button noscript-hidden" x="200" y="20">Save Progress</text>
@@ -40,8 +188,8 @@
       <text x="80" y="210" id="time-end">&lt;date&gt;</text>
     </g>
     <g id="menu" class="noscript-hidden">
-      <rect x="0" y="0" width="100%" height="100%" stroke-width="0" fill="#FFF8" />
-      <rect x="10" y="10" width="320" height="500" fill="#FFF" stroke="#0008" stroke-width="0.1" filter="url(#shadow)" />
+      <rect x="10" y="10" width="320" height="500" fill="url(#wood)" filter="url(#shadow)" />
+      <rect x="10" y="10" width="320" height="500" fill="#FFF4" stroke-width="0.1" />
       <foreignObject x="10" y="10" width="320" height="500">
         <body xmlns="http://www.w3.org/1999/xhtml">
           <h3>Start a New Puzzle!</h3>
@@ -142,6 +290,8 @@
       fill: #840;
       color: #840;
       text-decoration: none;
+      transition-property: fill, color;
+      transition-duration: 0.5s;
     }
     a, button, .button {
       cursor: pointer;
