@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 640 480" width="100%" height="100%" id="root" class="noscript" preserveAspectRatio="xMidYMid meet">
-  <title>🧩</title>
+  <title>🧩 Puzzle.SVG</title>
   <defs>
     <g id="ps"></g>
     <g id="ms"></g>
     <image id="img" width="1" height="1" pointer-events="none"
       href="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
     />
-    <filter id="shadow" x="0" y="0" width="200%" height="200%">
-      <feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
-      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="5" />
-      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="5" />
     </filter>
     <radialGradient id="menufade" cx="0" cy="0" fr="1">
       <stop offset="0%" stop-color="#FFF0" />
@@ -188,8 +186,8 @@
       <text x="80" y="210" id="time-end">&lt;date&gt;</text>
     </g>
     <g id="menu" class="noscript-hidden">
-      <rect x="10" y="10" width="320" height="500" fill="url(#wood)" filter="url(#shadow)" />
-      <rect x="10" y="10" width="320" height="500" fill="#FFF4" stroke-width="0.1" />
+      <rect x="10" y="10" width="320" height="500" rx="10" fill="url(#wood)" filter="url(#shadow)" />
+      <rect x="10" y="10" width="320" height="500" rx="10" fill="#FFF4" stroke-width="0.1" />
       <foreignObject x="10" y="10" width="320" height="500">
         <body xmlns="http://www.w3.org/1999/xhtml">
           <h3>Start a New Puzzle!</h3>
@@ -240,6 +238,9 @@
     text, body {
       user-select: none;
     }
+    body {
+      margin: 1em 0;
+    }
     img[src=""] {
       display: none;
     }
@@ -248,6 +249,77 @@
       font-size: small;
       bottom: 0;
       width: 100%;
+    }
+    .field, input, textarea, button {
+      background-color: #FFF;
+      color: #000;
+      border: solid 1px rgba(0, 0, 0, 0.1);
+      border-radius: 0.4em;
+      margin: 0.1em;
+      padding: 0.4em 0.8em;
+      font-size: 80%;
+      transition: box-shadow 0.1s;
+      display: inline-block;
+    }
+    input:focus, textarea:focus, button:focus {
+      outline: none;
+    }
+    .field, input, textarea {
+      box-shadow: -0.02em -0.02em 0.1em rgba(255, 255, 255, 0.9) inset, 0.02em 0.02em 0.1em rgba(0, 0, 0, 0.35) inset;
+      background-image: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.7));
+    }
+    input:focus, textarea:focus {
+      box-shadow: -0.05em -0.05em 0.1em rgba(255, 255, 255, 0.9) inset, 0.05em 0.05em 0.1em rgba(0, 0, 0, 0.35) inset;
+    }
+    .field.disabled, input[disabled], textarea[disabled] {
+      color: inherit;
+      box-shadow: 0 0 0 transparent inset;
+      filter: contrast(60%) grayscale(50%);
+      cursor: not-allowed;
+    }
+    button {
+      position: relative;
+      color: black;
+      background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), transparent);
+      box-shadow: 0.05em 0.05em 0.1em rgba(255, 255, 255, 0.9) inset, -0.05em -0.05em 0.1em rgba(0, 0, 0, 0.35) inset;
+      text-shadow: 0.05em 0.05em 0.02em rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+    }
+    button::before {
+      content: '';
+      position: absolute;
+      margin: 0;
+      padding: 0;
+      top: 0.3em;
+      bottom: 0.3em;
+      left: 0.4em;
+      right: 0.4em;
+      outline: dotted 1px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.1s;
+    }
+    button:not([disabled]):hover {
+      background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
+    }
+    button:active {
+      box-shadow: -0.05em -0.05em 0.1em rgba(255, 255, 255, 0.9) inset, 0.05em 0.05em 0.1em rgba(0, 0, 0, 0.35) inset;
+    }
+    button:focus::before {
+      opacity: 0.75;
+    }
+    button:not([disabled])::first-letter {
+      text-decoration: underline;
+    }
+    button[type='submit'] {
+      font-weight: bolder;
+    }
+    button[disabled] {
+      color: inherit;
+      box-shadow: 0 0 0 transparent inset;
+      text-shadow: -0.05em -0.05em 0.02em rgba(0, 0, 0, 0.35), 0.05em 0.05em 0.02em white;
+      filter: contrast(60%) grayscale(50%);
+      cursor: not-allowed;
     }
     #preview {
       max-height: 220px;
@@ -279,8 +351,11 @@
     }
     label.button input {
       visibility: hidden;
+      position: absolute;
       width: 0;
       height: 0;
+      padding: 0;
+      margin: 0;
     }
     .secondary-desc {
       font-size: smaller;
@@ -322,6 +397,11 @@
       cursor: default;
       background: #0000;
       caret-color: #0000;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      text-shadow: none;
+      display: block;
     }
     textarea.pastearea::placeholder {
       text-align: center;
@@ -340,7 +420,7 @@
     #certificate, img {
       pointer-events: none;
     }
-    #certificate, #hud, #menu, input, textarea {
+    #certificate, #hud, #menu, input, textarea, button {
       font-family: Georgia, 'Times New Roman', serif;
     }
     #certificate:not(.show), #menu:not(.show) {
