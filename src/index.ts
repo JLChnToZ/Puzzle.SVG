@@ -108,7 +108,6 @@ export class MainHandler {
   }
 
   async updateImage(blobOrSrc: string | Blob) {
-    console.log('Load image', blobOrSrc);
     const src = blobOrSrc instanceof Blob ? await getUrl(blobOrSrc) : blobOrSrc;
     const { width, height } = await getImageDimensions(src);
     this.imageUrl = src;
