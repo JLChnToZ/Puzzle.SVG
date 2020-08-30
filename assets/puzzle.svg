@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 640 480" width="100%" height="100%" id="root" class="noscript" preserveAspectRatio="xMidYMid meet">
   <title>🧩 Puzzle.SVG</title>
   <defs>
@@ -10,10 +11,21 @@
     <filter id="shadow">
       <feDropShadow dx="2" dy="2" stdDeviation="5" />
     </filter>
+    <filter id="shadowlower">
+      <feDropShadow dx="1" dy="1" stdDeviation="2" />
+    </filter>
     <radialGradient id="menufade" cx="0" cy="0" fr="1">
       <stop offset="0%" stop-color="#FFF0" />
       <stop offset="100%" stop-color="#FFF8" />
     </radialGradient>
+    <filter id="bevel" filterUnits="objectBoundingBox" x="-10%" y="-10%" width="150%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur" />
+      <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.5" specularExponent="10" result="specOut" lighting-color="white">
+        <fePointLight x="-5000" y="-10000" z="20000" />
+      </feSpecularLighting>
+      <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut2" />
+      <feComposite in="SourceGraphic" in2="specOut2" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint" />
+    </filter>
     <linearGradient id="wood1" x1="500%" x2="0" y1="0" y2="0" spreadMethod="repeat">
       <stop offset="0%" stop-color="#eec48780" />
       <stop offset="3%" stop-color="#f3cf9a80" />
@@ -62,7 +74,6 @@
       <stop offset="91%" stop-color="#faddb080" />
       <stop offset="92%" stop-color="#f3cf9a80" />
       <stop offset="96%" stop-color="#f8d8a280" />
-      <stop offset="97%" stop-color="#f3cf9a80" />
       <stop offset="97%" stop-color="#f3cf9a80" />
       <stop offset="98%" stop-color="#f3cf9a80" />
       <stop offset="100%" stop-color="#f3cf9a80" />
@@ -116,7 +127,6 @@
       <stop offset="92%" stop-color="#f3cf9a4d" />
       <stop offset="96%" stop-color="#f8d8a24d" />
       <stop offset="97%" stop-color="#f3cf9a4d" />
-      <stop offset="97%" stop-color="#f3cf9a4d" />
       <stop offset="98%" stop-color="#f3cf9a4d" />
       <stop offset="100%" stop-color="#f3cf9a4d" />
     </linearGradient>
@@ -147,7 +157,6 @@
       <stop offset="91%" stop-color="#faddb04d" />
       <stop offset="92%" stop-color="#f3cf9a4d" />
       <stop offset="96%" stop-color="#f8d8a24d" />
-      <stop offset="97%" stop-color="#f3cf9a4d" />
       <stop offset="97%" stop-color="#f3cf9a4d" />
       <stop offset="98%" stop-color="#f3cf9a4d" />
       <stop offset="100%" stop-color="#f3cf9a4d" />
@@ -434,13 +443,28 @@
       font-size: x-large;
       font-weight: bold;
     }
+    .draggable {
+      filter: url(#shadowlower);
+    }
     .draggable .handler, .draggable.handler {
       cursor: move;
       cursor: grab;
     }
+    .draggable.grabbing {
+      filter: url(#shadow);
+    }
     .draggable.grabbing.handler, .draggable.grabbing .handler {
       cursor: move;
       cursor: grabbing;
+    }
+    .pzoverlay {
+      stroke: #000;
+      fill: #0008;
+      opacity: 0.5;
+      filter: url(#bevel);
+    }
+    #ms>mask>use {
+      fill: #FFF;
     }
   ]]>
   </style>

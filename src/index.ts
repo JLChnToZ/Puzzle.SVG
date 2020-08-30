@@ -165,7 +165,6 @@ export class MainHandler {
 
       const maskPath = mask.appendChild(this.document.createElementNS(NS_SVG, 'use'));
       maskPath.href.baseVal = `#${path.id}`;
-      maskPath.setAttribute('fill', 'white');
 
       const instance = instanceGroup.appendChild(this.document.createElementNS(NS_SVG, 'g'));
       instance.id = `${path.id}-i`;
@@ -176,10 +175,8 @@ export class MainHandler {
       base.setAttribute('mask', `url(#${mask.id})`);
 
       const decoPath = instance.appendChild(this.document.createElementNS(NS_SVG, 'use'));
-      decoPath.classList.add('handler');
+      decoPath.classList.add('handler', 'pzoverlay');
       decoPath.href.baseVal = `#${path.id}`;
-      decoPath.setAttribute('stroke', 'black');
-      decoPath.setAttribute('fill', 'transparent');
 
       const m = pathIdMatcher.exec(path.id);
       if(m) {
