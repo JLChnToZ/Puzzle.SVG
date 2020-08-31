@@ -33,10 +33,11 @@ export class MainHandler {
   imagePreview: HTMLImageElement;
   colSelector: HTMLInputElement;
   rowSelector: HTMLInputElement;
+  submitButton: HTMLButtonElement;
   fixedPatternCheckbox: HTMLInputElement;
   sizeCountDisplay: HTMLSpanElement;
 
-  imageUrl: string;
+  imageUrl?: string;
   width: number = 1;
   height: number = 1;
   baseTime: number = 0;
@@ -45,8 +46,8 @@ export class MainHandler {
   startTime?: Date;
   endTime?: Date;
   resumeTime?: Date;
-  private _xc: number = 1;
-  private _yc: number = 1;
+  private _xc: number = 2;
+  private _yc: number = 2;
   private timer?: number;
 
   get xCount() {
@@ -54,7 +55,11 @@ export class MainHandler {
   }
   set xCount(value: number) {
     this._xc = value;
-    this._yc = Math.max(1,Math.round(value / this.width * this.height));
+    this._yc = Math.round(value / this.width * this.height);
+    if(this._yc < 2 || !Number.isFinite(this._yc)) {
+      this._xc = Math.round(2 / this.height * this.width);
+      this._yc = 2;
+    }
   } 
 
   get yCount() {
@@ -62,7 +67,11 @@ export class MainHandler {
   }
   set yCount(value: number) {
     this._yc = value;
-    this._xc = Math.max(1, Math.round(value / this.height * this.width));
+    this._xc = Math.round(value / this.height * this.width);
+    if(this._xc < 2 || !Number.isFinite(this._xc)) {
+      this._xc = 2;
+      this._yc = Math.round(2 / this.width * this.height);
+    }
   }
 
   constructor(root: GlobalEventHandlers & ParentNode = document) {
@@ -95,10 +104,10 @@ export class MainHandler {
     this.sizeCountDisplay = this.menuForm.querySelector<HTMLSpanElement>('#size-count')!;
     this.fixedPatternCheckbox = this.menuForm.querySelector<HTMLInputElement>('input#fixed-pattern')!;
     this.imagePreview = this.menuForm.querySelector<HTMLImageElement>('img#preview')!;
+    this.submitButton = this.menuForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     this.root.querySelector('#new-game')?.addEventListener('click', this.menu.bind(this));
     this.root.querySelector('#save-game')?.addEventListener('click', this.save.bind(this));
     this.imageElement = root.querySelector<SVGImageElement>('image#img')!;
-    this.imageUrl = this.imageElement.href.baseVal;
     window.addEventListener('resize', this.onWindowResize.bind(this));
     Object.assign(this, registerDraggable(
       root, this.onDrag.bind(this), this.onDrop.bind(this),
@@ -113,14 +122,16 @@ export class MainHandler {
     this.imageUrl = src;
     this.width = width;
     this.height = height;
-    this._xc = Math.round(width / 100);
-    this._yc = Math.round(height / 100);
-    this.colSelector.valueAsNumber = this.xCount = Math.round(this.width / 100);
+    this.xCount = Math.round(width / 100);
+    this.colSelector.valueAsNumber = this.xCount;
     this.rowSelector.valueAsNumber = this.yCount;
     this.onSizeChange();
     if(this.imagePreview.src.startsWith('blob:'))
       URL.revokeObjectURL(this.imagePreview.src);
     this.imagePreview.src = blobOrSrc instanceof Blob ? URL.createObjectURL(blobOrSrc) : src;
+    this.submitButton.disabled = false;
+    this.colSelector.disabled = false;
+    this.rowSelector.disabled = false;
   }
 
   calculateTheshold() {
@@ -132,6 +143,9 @@ export class MainHandler {
     clearChildren(this.instanceGroup);
     clearChildren(this.masksElement);
     hideCetificate();
+    const unitSize = this._xc * 100;
+    this.height *= unitSize / this.width;
+    this.width = unitSize;
     this.time = 0;
     this.baseTime = 0;
     this.startTime = new Date();
@@ -154,7 +168,7 @@ export class MainHandler {
     const viewWidth = Math.max(640, this.width * 1.5);
     const viewHeight = Math.max(480, this.height * 1.5);
     this.root.setAttribute('viewBox', `0 0 ${viewWidth} ${viewHeight}`);
-    this.imageElement.href.baseVal = this.imageUrl;
+    this.imageElement.href.baseVal = this.imageUrl!;
     this.imageElement.setAttribute('width', this.width.toString());
     this.imageElement.setAttribute('height', this.height.toString());
     const defs = this.document.createDocumentFragment();
@@ -338,12 +352,14 @@ export class MainHandler {
   private onColChange() {
     this.xCount = this.colSelector.valueAsNumber;
     this.rowSelector.valueAsNumber = this.yCount;
+    this.colSelector.valueAsNumber = this.xCount;
     this.onSizeChange();
   }
 
   private onRowChange() {
     this.yCount = this.rowSelector.valueAsNumber;
     this.colSelector.valueAsNumber = this.xCount;
+    this.rowSelector.valueAsNumber = this.yCount;
     this.onSizeChange();
   }
 
@@ -362,6 +378,9 @@ export class MainHandler {
     if(this.imagePreview.src.startsWith('blob:'))
       URL.revokeObjectURL(this.imagePreview.src);
     this.imagePreview.src = '';
+    this.submitButton.disabled = true;
+    this.colSelector.disabled = true;
+    this.rowSelector.disabled = true;
     this.menuGroup.classList.remove('show');
   }
 

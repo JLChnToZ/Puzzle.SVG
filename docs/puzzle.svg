@@ -213,9 +213,9 @@
             </div>
             <div>
               <label>Puzzle Size: </label>
-              <input type="number" class="size-input" id="col-input" size="3" min="1" value="1" />
+              <input type="number" class="size-input" id="col-input" size="3" min="2" value="2" disabled="disabled" />
               <label>×</label>
-              <input type="number" class="size-input" id="row-input" size="3" min="1" value="1" /><br />
+              <input type="number" class="size-input" id="row-input" size="3" min="2" value="2" disabled="disabled" /><br />
               <span id="size-count" />
             </div>
             <div>
@@ -225,7 +225,7 @@
               </label>
             </div>
             <div class="align-center">
-              <button type="submit">Start Game</button>
+              <button type="submit" disabled="disabled">Start Game</button>
               <button type="reset">Cancel</button>
             </div>
           </form>
