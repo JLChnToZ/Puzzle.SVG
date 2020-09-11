@@ -7,6 +7,7 @@ export async function downloadDocument(src: Element, name: string, treatments?: 
   root.replaceChild(clone, root.firstChild!);
   await Promise.all(Array.prototype.map.call(clone.querySelectorAll('script'), resolveScript));
   await treatments?.(clone, root);
+  removeWhiteSpaces(root);
   const blob = new Blob([new XMLSerializer().serializeToString(root)], { type: 'image/svg+xml' });
   const element = document.createElementNS(NS_XHTML, 'a') as HTMLAnchorElement;
   element.href = URL.createObjectURL(blob);
@@ -27,4 +28,18 @@ async function resolveScript(script: Element) {
     script.removeAttribute('href');
     script.appendChild(script.ownerDocument.createCDATASection(await (await fetch(href)).text()));
   }
+}
+
+function removeWhiteSpaces(root: Node) {
+  const document = root.ownerDocument ?? root as Document;
+  const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const matcher = /^\s*$/;
+  const removals: Text[] = [];
+  let current: Node | null;
+  while(current = treeWalker.nextNode())
+    if((current instanceof Text) && matcher.test(current.wholeText))
+      removals.push(current);
+  for(const whiteSpace of removals)
+    whiteSpace.remove();
+  return root;
 }
