@@ -1,4 +1,4 @@
-import { NS_SVG, NS_XHTML } from './utils';
+import { CDATA_END, NS_SVG, NS_XHTML, styleSpaceMatcher, spaceMatcher, trimmableMatcher } from './utils';
 
 export async function downloadDocument(src: Element, name: string, treatments?: (root: Element, document: Document) => (void | Promise<void>)) {
   const document = src.ownerDocument;
@@ -7,6 +7,7 @@ export async function downloadDocument(src: Element, name: string, treatments?: 
   root.replaceChild(clone, root.firstChild!);
   await Promise.all(Array.prototype.map.call(clone.querySelectorAll('script'), resolveScript));
   await treatments?.(clone, root);
+  clone.querySelectorAll('style').forEach(minifyStyle);
   removeWhiteSpaces(root);
   const blob = new Blob([new XMLSerializer().serializeToString(root)], { type: 'image/svg+xml' });
   const element = document.createElementNS(NS_XHTML, 'a') as HTMLAnchorElement;
@@ -33,13 +34,39 @@ async function resolveScript(script: Element) {
 function removeWhiteSpaces(root: Node) {
   const document = root.ownerDocument ?? root as Document;
   const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  const matcher = /^\s*$/;
   const removals: Text[] = [];
+  const checkSpaces: Text[] = [];
   let current: Node | null;
-  while(current = treeWalker.nextNode())
-    if((current instanceof Text) && matcher.test(current.wholeText))
+  while(current = treeWalker.nextNode()) {
+    if(!(current instanceof Text) || (current instanceof CDATASection))
+      continue;
+    if(spaceMatcher.test(current.wholeText))
       removals.push(current);
+    else
+      checkSpaces.push(current);
+  }
   for(const whiteSpace of removals)
     whiteSpace.remove();
+  for(const text of checkSpaces) {
+    const original = text.wholeText;
+    const changed = original.replaceAll(trimmableMatcher, ' ');
+    if(original !== changed) text.replaceWith(text.ownerDocument.createTextNode(changed));
+  }
   return root;
+}
+
+function minifyStyle(style: Element) {
+  const textContent = style.textContent?.replaceAll(styleSpaceMatcher, '');
+  if(textContent == null) return;
+  try {
+    const child = style.firstChild;
+    if((child instanceof CDATASection) && !textContent.includes(CDATA_END)) {
+      const cdata = style.ownerDocument.createCDATASection(textContent);
+      style.textContent = '';
+      style.appendChild(cdata);
+    } else
+      style.textContent = textContent;
+  } catch {
+    style.textContent = textContent;
+  }
 }

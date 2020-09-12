@@ -1,5 +1,10 @@
 export const NS_SVG = 'http://www.w3.org/2000/svg';
 export const NS_XHTML = 'http://www.w3.org/1999/xhtml';
+export const CDATA_END = String.fromCharCode(0x5D, 0x5D, 0x3E);
+
+export const spaceMatcher = /^\s*$/;
+export const trimmableMatcher = /^\s+|\s+$/g;
+export const styleSpaceMatcher = /(?<=^|\W)\s+|\s+(?![\w\.\[\:\*#])/g;
 
 export function round(n: number, c = 0) {
   c = 10 ** c;
