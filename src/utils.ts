@@ -120,3 +120,31 @@ export function toPromise(thisArg: any, src: (...args: any[]) => void, ...args: 
 export function toPromise(thisArg: any, src: (...args: any[]) => void, ...args: any[]) {
   return new Promise(resolve => src.call(thisArg, ...args, resolve));
 }
+
+export function findStyle(selector: string, root: (ParentNode & Node) = window.document) {
+  const styleElements = root.querySelectorAll<Element & LinkStyle>('style');
+  let lastSheet: CSSStyleSheet | undefined;
+  for(let i = styleElements.length - 1; i >= 0; i--) {
+    const { sheet } = styleElements[i];
+    if(!sheet) continue;
+    if(!lastSheet) lastSheet = sheet;
+    for(let j = sheet.rules.length - 1; j >= 0; j--) {
+      const rule = sheet.rules[j];
+      if(rule.type !== CSSRule.STYLE_RULE)
+        continue;
+      for(const targetSelector of (rule as CSSStyleRule).selectorText.split(','))
+        if(targetSelector.trim() === selector)
+          return rule as CSSStyleRule;
+    }
+  }
+  if(!lastSheet) {
+    const document = root.ownerDocument ?? root as Document;
+    lastSheet = (
+      (document.documentElement instanceof SVGElement) ?
+      (document.appendChild(document.createElementNS(NS_SVG, 'style')) as SVGStyleElement & LinkStyle) :
+      document.head.appendChild(document.createElement('style'))
+    ).sheet!;
+  }
+  const index = lastSheet.insertRule(`${selector} {}`, lastSheet.rules.length - 1);
+  return lastSheet.cssRules[index] as CSSStyleRule;
+}

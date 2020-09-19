@@ -1,6 +1,6 @@
 import { JigsawGenerator } from './puzzle-generator';
 import { registerDraggable, DraggingState } from './drag-handler';
-import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG, toPromise, interceptEvent, transferChildren } from './utils';
+import { formatTime, getUrl, getImageDimensions, clearChildren, NS_SVG, toPromise, interceptEvent, transferChildren, findStyle } from './utils';
 import { downloadDocument } from './xml-clone';
 import { showCertificate, hideCetificate } from './certificate';
 import { registerDropZone } from './dropzone';
@@ -22,7 +22,7 @@ export class MainHandler {
   root: SVGSVGElement;
   masksElement: SVGGElement;
   imageElement: SVGImageElement;
-  uiGroup: SVGGElement;
+  uiScaleRule: CSSStyleRule;
   pathGroup: SVGGElement;
   instanceGroup: SVGGElement;
   timeDisp: SVGTextElement;
@@ -74,13 +74,13 @@ export class MainHandler {
     }
   }
 
-  constructor(root: GlobalEventHandlers & ParentNode = document) {
+  constructor(root: GlobalEventHandlers & ParentNode & Node = document) {
     root.querySelector('.noscript')?.classList.remove('noscript');
     this.root = root.querySelector('svg')!;
     registerDropZone(this.root);
     this.document = root instanceof Document ? root : this.root.ownerDocument;
     this.masksElement = root.querySelector<SVGGElement>('g#ms')!;
-    this.uiGroup = root.querySelector<SVGGElement>('g#ui')!;
+    this.uiScaleRule = findStyle('.ui>*', root);
     this.pathGroup = root.querySelector<SVGGElement>('g#ps')!;
     this.instanceGroup = root.querySelector<SVGGElement>('g#ins')!;
     this.timeDisp = root.querySelector<SVGTextElement>('text#time')!;
@@ -403,7 +403,7 @@ export class MainHandler {
     const viewRatio = viewWidth / viewHeight;
     const windowRatio = window.innerWidth / window.innerHeight;
     const scale = (viewRatio > windowRatio ? viewWidth / window.innerWidth : viewHeight / window.innerHeight) * window.devicePixelRatio;
-    this.uiGroup.transform.baseVal.getItem(0).setScale(scale, scale);
+    this.uiScaleRule.style.transform = `scale(${scale})`;
   }
 
   private onPaste(e: ClipboardEvent) {
